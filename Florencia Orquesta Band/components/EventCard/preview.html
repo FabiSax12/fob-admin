@@ -1,0 +1,24 @@
+<!-- @dsCard group="Cards" height=360 -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8">
+<style>
+  html, body { margin: 0; background: var(--background); color: var(--foreground); font-family: var(--font-sans); }
+  #root { padding: 0 32px; max-width: 640px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+  var F = window.FOB, h = React.createElement;
+  ReactDOM.createRoot(document.getElementById('root')).render(h(React.Fragment, null,
+    h(F.EventCard, { date: '2025-10-18', name: 'Baile Benéfico Solidario - Florencia', passed: false,
+      location: { name: 'Salón Comunal de Platanar, Florencia' }, time: { start: '20:00' },
+      ticket: { type: 'Preventa', presale: { price: '₡4.000' }, regular: { price: '₡6.000' } } }),
+    h(F.EventCard, { date: '2025-03-30', name: 'Club de Leones',
+      location: { name: 'Hotel Los Lagos, Fortuna' }, time: { start: '19:00' },
+      ticket: { type: 'Entrada Libre', regular: { price: 'Privado' } } })
+  ));
+</script>
+</body>
+</html>

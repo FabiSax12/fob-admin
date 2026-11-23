@@ -1,0 +1,34 @@
+<!-- @dsCard group="Foundations" height=300 page subtitle="Gradient tokens on the FOB ground" -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8">
+<style>
+  html, body { margin: 0; background: var(--background); color: var(--color-fob-text); font-family: var(--font-sans); }
+  .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; padding: 32px; }
+  .swatch { position: relative; height: 180px; border-radius: 2px; border: 1px solid var(--color-fob-700); overflow: hidden; }
+  /* a warm stand-in for a photo, from the brand ramp, so the overlays have something to darken */
+  .photo { position: absolute; inset: 0; background: var(--color-fob-amber); }
+  .photo::before { content: ""; position: absolute; left: 0; right: 0; top: 30%; height: 40%; background: var(--color-fob-copper); }
+  .layer { position: absolute; inset: 0; }
+  .hero { background: var(--gradient-hero-overlay); }
+  .event { background: var(--gradient-event-overlay); }
+  .fallback { background: var(--gradient-event-fallback); }
+  .fades { background: var(--color-fob-900); }
+  .fades .row { position: absolute; top: 50%; left: 0; right: 0; transform: translateY(-50%); display: flex; gap: 8px; padding: 0 4px; }
+  .fades .song { flex: 0 0 64px; height: 56px; border-radius: 2px; background: var(--color-fob-700); }
+  .fade-start, .fade-end { position: absolute; top: 0; bottom: 0; width: 64px; }
+  .fade-start { left: 0; background: var(--gradient-fade-start); }
+  .fade-end { right: 0; background: var(--gradient-fade-end); }
+  .label { margin-top: 10px; font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-fob-subtle); }
+</style>
+</head>
+<body>
+<div class="grid">
+  <div><div class="swatch"><div class="photo"></div><div class="layer hero"></div></div><div class="label">hero-overlay</div></div>
+  <div><div class="swatch"><div class="photo"></div><div class="layer event"></div></div><div class="label">event-overlay</div></div>
+  <div><div class="swatch"><div class="layer fallback"></div></div><div class="label">event-fallback</div></div>
+  <div><div class="swatch fades"><div class="row"><div class="song"></div><div class="song"></div><div class="song"></div></div><div class="fade-start"></div></div><div class="label">fade-start</div></div>
+  <div><div class="swatch fades"><div class="row" style="justify-content:flex-end"><div class="song"></div><div class="song"></div><div class="song"></div></div><div class="fade-end"></div></div><div class="label">fade-end</div></div>
+</div>
+</body>
+</html>

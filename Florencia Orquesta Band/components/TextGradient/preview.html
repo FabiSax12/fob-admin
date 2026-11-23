@@ -1,0 +1,20 @@
+<!-- @dsCard group="Typography" height=110 -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8">
+<style>
+  html, body { margin: 0; background: var(--background); color: var(--foreground); font-family: var(--font-sans); }
+  #root { padding: 32px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+  var F = window.FOB, h = React.createElement;
+  ReactDOM.createRoot(document.getElementById('root')).render(
+    h('p', { style: { margin: 0, fontFamily: 'var(--font-serif)', fontSize: '2.4rem', lineHeight: 1.2, color: 'var(--color-fob-text)' } },
+      'Nuestro ', h(F.TextGradient, null, 'Repertorio'))
+  );
+</script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!-- @dsCard group="Feedback" height=260 -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8">
+<style>
+  html, body { margin: 0; background: var(--background); color: var(--foreground); font-family: var(--font-sans); }
+  #root {  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+  var F = window.FOB, h = React.createElement;
+  ReactDOM.createRoot(document.getElementById('root')).render(
+    h(F.MessageDialog, { tone: 'success', title: '¡Mensaje enviado!', onClose: function () {} }, 'Muchas gracias. Te respondemos a la brevedad.')
+  );
+</script>
+</body>
+</html>

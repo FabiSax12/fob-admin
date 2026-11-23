@@ -1,0 +1,249 @@
+{
+  "manifestVersion": 3,
+  "name": "Florencia Orquesta Band",
+  "namespace": "FOB",
+  "files": [
+    "assets/App icons/README.md",
+    "assets/Icons/README.md",
+    "assets/Logos/README.md",
+    "components/BandMemberCard/README.md",
+    "components/Button/README.md",
+    "components/Card/README.md",
+    "components/EventCard/README.md",
+    "components/GenreTabs/README.md",
+    "components/MessageDialog/README.md",
+    "components/SectionTitle/README.md",
+    "components/TextField/README.md",
+    "components/TextGradient/README.md",
+    "components/ThemedButton/README.md",
+    "components/bundle.css",
+    "components/bundle.js",
+    "components/index.d.ts",
+    "components/lib/react-dom.production.min.js",
+    "components/lib/react.production.min.js",
+    "tokens.css"
+  ],
+  "libraries": [
+    {
+      "name": "react",
+      "version": "18.3.1",
+      "global": "React",
+      "file": "components/lib/react.production.min.js"
+    },
+    {
+      "name": "react-dom",
+      "version": "18.3.1",
+      "global": "ReactDOM",
+      "file": "components/lib/react-dom.production.min.js"
+    }
+  ],
+  "components": [
+    {
+      "name": "ThemedButton",
+      "group": "Actions",
+      "summary": "The brand's signature button: an amber hairline outline with a gold label, for every main call to action."
+    },
+    {
+      "name": "Button",
+      "group": "Actions",
+      "summary": "The shadcn/ui button (new-york style), mapped onto the FOB palette through the shadcn variables."
+    },
+    {
+      "name": "TextField",
+      "group": "Forms",
+      "summary": "A labelled text input or textarea in the contact form's style: uppercase muted label, color-fob-900 field, 2px corners, amber focus."
+    },
+    {
+      "name": "GenreTabs",
+      "group": "Navigation",
+      "summary": "A row of serif tabs that switch the repertoire between genres, with a gold underline that slides in under the selected one."
+    },
+    {
+      "name": "Card",
+      "group": "Cards",
+      "summary": "The shadcn/ui card: a card surface with a 1px border hairline and soft corners, split into header, title, description, content and footer parts."
+    },
+    {
+      "name": "EventCard",
+      "group": "Cards",
+      "summary": "One row of the events list: a gold serif date block on the left, the event's name, venue, start time and ticket chips beside it."
+    },
+    {
+      "name": "BandMemberCard",
+      "group": "Cards",
+      "summary": "A musician's 3:4 portrait over their name in Gloock and instrument in small uppercase."
+    },
+    {
+      "name": "SectionTitle",
+      "group": "Typography",
+      "summary": "The heading that opens every home-page section: Gloock in color-fob-text with a short amber rule beneath."
+    },
+    {
+      "name": "TextGradient",
+      "group": "Typography",
+      "summary": "A gold serif accent for one or two words inside a heading."
+    },
+    {
+      "name": "MessageDialog",
+      "group": "Feedback",
+      "summary": "A centered confirmation over a dark veil, used after the contact form submits."
+    },
+    {
+      "name": "Gradients",
+      "group": "Foundations",
+      "page": true
+    }
+  ],
+  "assetGroups": [
+    {
+      "name": "Logos",
+      "tile": "l",
+      "order": [
+        "logo_simple.webp",
+        "logo_simple.png",
+        "logo.png",
+        "FOB_Logo.webp"
+      ],
+      "files": [
+        {
+          "path": "assets/Logos/logo_simple.webp",
+          "id": "d75d9a8d4ce0c0923c1b316bce6a1843"
+        },
+        {
+          "path": "assets/Logos/logo_simple.png",
+          "id": "543fa3f18f6ce4f1e29bae8992ae1388"
+        },
+        {
+          "path": "assets/Logos/logo.png",
+          "id": "1406f293a1e5cecd7134f5b936da9b0b"
+        },
+        {
+          "path": "assets/Logos/FOB_Logo.webp",
+          "id": "b76a3cd1d777ffa1831f0e071d994ed8"
+        }
+      ]
+    },
+    {
+      "name": "App icons",
+      "tile": "s",
+      "order": [
+        "android-chrome-512x512.png",
+        "android-chrome-192x192.png",
+        "apple-touch-icon.png",
+        "favicon-32x32.png",
+        "favicon-16x16.png"
+      ],
+      "files": [
+        {
+          "path": "assets/App icons/android-chrome-512x512.png",
+          "id": "44bcfde73b137ede2820e55f6699df83"
+        },
+        {
+          "path": "assets/App icons/android-chrome-192x192.png",
+          "id": "fdc7ee6709a827155d84c68047a2d54a"
+        },
+        {
+          "path": "assets/App icons/apple-touch-icon.png",
+          "id": "ae63af0ee58896619a26a2d182a0692e"
+        },
+        {
+          "path": "assets/App icons/favicon-32x32.png",
+          "id": "8542fae84fa4f5bba27b084ca755ec4b"
+        },
+        {
+          "path": "assets/App icons/favicon-16x16.png",
+          "id": "518ada5014ca19067cd8822f9d3722c0"
+        }
+      ]
+    },
+    {
+      "name": "Icons",
+      "tile": "xs",
+      "order": [
+        "lucide--calendar.svg",
+        "lucide--map-pin.svg"
+      ],
+      "files": [
+        {
+          "path": "assets/Icons/lucide--calendar.svg",
+          "id": "ffecbc4c0d1f9535246399f61f21529f"
+        },
+        {
+          "path": "assets/Icons/lucide--map-pin.svg",
+          "id": "4d718f86a0b5e4a51483cb7f445f1f79"
+        }
+      ]
+    }
+  ],
+  "storage": {
+    "files": {
+      "assets/App icons/android-chrome-192x192.png": {
+        "store": "blob",
+        "id": "fdc7ee6709a827155d84c68047a2d54a",
+        "bytes": 47794,
+        "type": "image/png"
+      },
+      "assets/App icons/android-chrome-512x512.png": {
+        "store": "blob",
+        "id": "44bcfde73b137ede2820e55f6699df83",
+        "bytes": 300747,
+        "type": "image/png"
+      },
+      "assets/App icons/apple-touch-icon.png": {
+        "store": "blob",
+        "id": "ae63af0ee58896619a26a2d182a0692e",
+        "bytes": 42753,
+        "type": "image/png"
+      },
+      "assets/App icons/favicon-16x16.png": {
+        "store": "blob",
+        "id": "518ada5014ca19067cd8822f9d3722c0",
+        "bytes": 790,
+        "type": "image/png"
+      },
+      "assets/App icons/favicon-32x32.png": {
+        "store": "blob",
+        "id": "8542fae84fa4f5bba27b084ca755ec4b",
+        "bytes": 2265,
+        "type": "image/png"
+      },
+      "assets/Icons/lucide--calendar.svg": {
+        "store": "blob",
+        "id": "ffecbc4c0d1f9535246399f61f21529f",
+        "bytes": 351,
+        "type": "image/svg+xml"
+      },
+      "assets/Icons/lucide--map-pin.svg": {
+        "store": "blob",
+        "id": "4d718f86a0b5e4a51483cb7f445f1f79",
+        "bytes": 386,
+        "type": "image/svg+xml"
+      },
+      "assets/Logos/FOB_Logo.webp": {
+        "store": "blob",
+        "id": "b76a3cd1d777ffa1831f0e071d994ed8",
+        "bytes": 65128,
+        "type": "image/webp"
+      },
+      "assets/Logos/logo.png": {
+        "store": "blob",
+        "id": "1406f293a1e5cecd7134f5b936da9b0b",
+        "bytes": 281997,
+        "type": "image/png"
+      },
+      "assets/Logos/logo_simple.png": {
+        "store": "blob",
+        "id": "543fa3f18f6ce4f1e29bae8992ae1388",
+        "bytes": 252366,
+        "type": "image/png"
+      },
+      "assets/Logos/logo_simple.webp": {
+        "store": "blob",
+        "id": "d75d9a8d4ce0c0923c1b316bce6a1843",
+        "bytes": 34082,
+        "type": "image/webp"
+      }
+    },
+    "blobBytesUsed": 1028659
+  }
+}

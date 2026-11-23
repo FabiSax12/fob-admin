@@ -1,0 +1,21 @@
+<!-- @dsCard group="Forms" height=350 -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8">
+<style>
+  html, body { margin: 0; background: var(--background); color: var(--foreground); font-family: var(--font-sans); }
+  #root { padding: 32px; max-width: 560px; display: flex; flex-direction: column; gap: 20px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+  var F = window.FOB, h = React.createElement;
+  ReactDOM.createRoot(document.getElementById('root')).render(h(React.Fragment, null,
+    h(F.TextField, { id: 'name', label: 'Nombre', placeholder: 'Tu nombre completo', autoComplete: 'name' }),
+    h(F.TextField, { id: 'tel', type: 'tel', label: 'Teléfono', prefix: '+506', placeholder: '8888 8888' }),
+    h(F.TextField, { id: 'message', label: 'Mensaje', multiline: true, rows: 3, placeholder: 'Contanos sobre tu evento: tipo, fecha, lugar, cantidad de personas...' })
+  ));
+</script>
+</body>
+</html>

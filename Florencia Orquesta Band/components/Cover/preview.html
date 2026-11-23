@@ -1,0 +1,58 @@
+<!-- @dsCard height=320 -->
+<!doctype html>
+<html>
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gloock&family=Figtree:wght@400;500&display=swap">
+<style>
+  html, body { margin: 0; background: var(--color-fob-950); }
+  .cover { position: relative; width: 960px; height: 320px; overflow: hidden; background: var(--color-fob-950); }
+  .band { position: absolute; left: 0; top: 0; display: block; }
+  .copper { fill: var(--color-fob-copper); }
+  .amber  { fill: var(--color-fob-amber); }
+  .gold   { fill: var(--color-fob-gold); }
+  .cut    { stroke: var(--color-fob-950); stroke-width: 1px; }
+  .text { position: absolute; left: 48px; bottom: 40px; }
+  .name {
+    margin: 0;
+    font-family: var(--font-serif, "Gloock", Georgia, serif);
+    font-weight: 400;
+    font-size: 64px;
+    line-height: .95;
+    letter-spacing: -0.02em;
+    color: var(--color-fob-text);
+    white-space: nowrap;
+  }
+  .tagline {
+    margin: 12px 0 0;
+    max-width: 440px;
+    font-family: var(--font-sans, "Figtree", system-ui, sans-serif);
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--color-fob-subtle);
+  }
+</style>
+</head>
+<body>
+<div class="cover">
+  <svg class="band" width="960" height="112" viewBox="0 0 960 112" aria-hidden="true">
+    <!--
+      blocks: color-fob-copper 448×112, color-fob-amber 336×84, color-fob-gold 176×56 on color-fob-950 ground
+      arrangement: top-band skeleton (name too wide for the 440px zone at 64px); one strip of unequal bands stepping down left to right, light falling off a stage
+      pattern: editorial hairlines, from "the section-title rule" and "separate with hairlines and space, not shadows"; three 1px cuts in color-fob-950 at 28px pitch, landing on the step edges
+      scales: square corners (2px brand pieces; radius unused at this scale), widths and heights in 28px steps (448, 336; gold runs off the right edge)
+    -->
+    <rect class="copper" x="0" y="0" width="448" height="112"/>
+    <rect class="amber" x="448" y="0" width="336" height="84"/>
+    <rect class="gold" x="784" y="0" width="176" height="56"/>
+    <line class="cut" x1="0" y1="28.5" x2="960" y2="28.5"/>
+    <line class="cut" x1="0" y1="56.5" x2="784" y2="56.5"/>
+    <line class="cut" x1="0" y1="84.5" x2="448" y2="84.5"/>
+  </svg>
+  <div class="text">
+    <h1 class="name">Florencia Orquesta Band</h1>
+    <p class="tagline">Creando momentos a través de la música</p>
+  </div>
+</div>
+</body>
+</html>

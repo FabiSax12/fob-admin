@@ -1,0 +1,158 @@
+@import url("https://fonts.googleapis.com/css2?family=Gloock&family=Figtree:wght@300;400;500;600&display=swap");
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Florencia Orquesta Band design system — single dark theme. Source: Florencia Orquesta Band/tokens.css */
+:root {
+	--color-fob-950: oklch(0.07 0.007 50);
+	--color-fob-900: oklch(0.11 0.01 50);
+	--color-fob-800: oklch(0.16 0.013 50);
+	--color-fob-700: oklch(0.22 0.016 50);
+	--color-fob-600: oklch(0.3 0.018 50);
+	--color-fob-text: oklch(0.94 0.01 75);
+	--color-fob-subtle: oklch(0.67 0.01 65);
+	--color-fob-muted: oklch(0.42 0.008 55);
+	--color-fob-gold: oklch(0.83 0.155 72);
+	--color-fob-amber: oklch(0.72 0.17 50);
+	--color-fob-copper: oklch(0.58 0.15 33);
+
+	--background: oklch(0.07 0.007 50);
+	--foreground: oklch(0.94 0.01 75);
+	--card: oklch(0.11 0.01 50);
+	--card-foreground: oklch(0.94 0.01 75);
+	--popover: oklch(0.11 0.01 50);
+	--popover-foreground: oklch(0.94 0.01 75);
+	--primary: oklch(0.72 0.17 50);
+	--primary-foreground: oklch(0.07 0.007 50);
+	--secondary: oklch(0.16 0.013 50);
+	--secondary-foreground: oklch(0.94 0.01 75);
+	--muted: oklch(0.16 0.013 50);
+	--muted-foreground: oklch(0.67 0.01 65);
+	--accent: oklch(0.16 0.013 50);
+	--accent-foreground: oklch(0.94 0.01 75);
+	--destructive: oklch(0.55 0.18 25);
+	--destructive-foreground: oklch(0.94 0.01 75);
+	--border: oklch(0.22 0.016 50);
+	--input: oklch(0.16 0.013 50);
+	--ring: oklch(0.72 0.17 50);
+	--radius: 0.4rem;
+}
+
+@theme inline {
+	--font-serif: "Gloock", Georgia, serif;
+	--font-sans: "Figtree", system-ui, sans-serif;
+	--color-fob-950: var(--color-fob-950);
+	--color-fob-900: var(--color-fob-900);
+	--color-fob-800: var(--color-fob-800);
+	--color-fob-700: var(--color-fob-700);
+	--color-fob-600: var(--color-fob-600);
+	--color-fob-text: var(--color-fob-text);
+	--color-fob-subtle: var(--color-fob-subtle);
+	--color-fob-muted: var(--color-fob-muted);
+	--color-fob-gold: var(--color-fob-gold);
+	--color-fob-amber: var(--color-fob-amber);
+	--color-fob-copper: var(--color-fob-copper);
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-popover: var(--popover);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-secondary: var(--secondary);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-accent: var(--accent);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-destructive: var(--destructive);
+	--color-destructive-foreground: var(--destructive-foreground);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-ring: var(--ring);
+	--radius-sm: calc(var(--radius) - 1px);
+	--radius-md: var(--radius);
+	--radius-lg: calc(var(--radius) + 2px);
+	--radius-xl: calc(var(--radius) + 6px);
+}
+
+html {
+	color-scheme: dark;
+}
+
+html,
+body,
+#app {
+	min-height: 100%;
+}
+
+body {
+	font: 400 16px / 1.65 var(--font-sans);
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	-webkit-tap-highlight-color: transparent;
+}
+
+/* Typography styles from the design system, sized for mobile screens. */
+.page-title {
+	font-family: var(--font-serif);
+	font-size: clamp(2rem, 5vw, 3.2rem);
+	line-height: 1.25;
+	color: var(--color-fob-gold);
+}
+
+.section-title {
+	font-family: var(--font-serif);
+	font-size: clamp(1.5rem, 4vw, 2.2rem);
+	line-height: 1.25;
+	letter-spacing: -0.025em;
+}
+
+.card-title {
+	font-family: var(--font-serif);
+	font-size: clamp(1.1rem, 2vw, 1.3rem);
+	line-height: 1.375;
+}
+
+.date-numeral {
+	font-family: var(--font-serif);
+	font-size: clamp(2rem, 5vw, 3rem);
+	line-height: 1;
+	color: var(--color-fob-gold);
+}
+
+.instrument-label {
+	font-size: 12px;
+	line-height: 1.65;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--color-fob-subtle);
+}
+
+.eyebrow {
+	font-size: 10.4px;
+	line-height: 1.65;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--color-fob-subtle);
+}
+
+.amber-rule {
+	display: block;
+	width: 56px;
+	height: 1px;
+	margin-top: 16px;
+	background: var(--color-fob-amber);
+}
+
+@layer base {
+	* {
+		@apply border-border outline-ring/50;
+	}
+	body {
+		@apply bg-background text-foreground;
+	}
+}

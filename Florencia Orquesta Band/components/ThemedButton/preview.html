@@ -1,0 +1,21 @@
+<!-- @dsCard group="Actions" height=120 -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8">
+<style>
+  html, body { margin: 0; background: var(--background); color: var(--foreground); font-family: var(--font-sans); }
+  #root { padding: 32px; display: flex; flex-wrap: wrap; gap: 24px; align-items: center; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+  var F = window.FOB, h = React.createElement;
+  ReactDOM.createRoot(document.getElementById('root')).render(h(React.Fragment, null,
+    h(F.ThemedButton, { href: '#contacto', arrow: true }, 'Reservá tu fecha'),
+    h(F.ThemedButton, { href: '/contacto' }, 'Consultá disponibilidad'),
+    h(F.ThemedButton, { type: 'submit' }, 'Enviar mensaje')
+  ));
+</script>
+</body>
+</html>
