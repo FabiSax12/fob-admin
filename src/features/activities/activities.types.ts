@@ -12,6 +12,11 @@ export const ACTIVITY_TYPE_LABELS: Record<ActivityType, string> = {
 
 export type ActivityStatus = "draft" | "published";
 
+export const ACTIVITY_STATUS_LABELS: Record<ActivityStatus, string> = {
+	draft: "Borrador",
+	published: "Publicada",
+};
+
 export interface Activity {
 	id: string;
 	type: ActivityType;
@@ -82,3 +87,23 @@ export const activityInputSchema = z
 	}));
 
 export type ActivityInput = z.input<typeof activityInputSchema>;
+
+/** Shown in a setlist for a song id the repertoire no longer has. */
+export const MISSING_SONG_NAME = "Canción que ya no está en el repertorio";
+
+export interface SetlistEntry {
+	songId: string;
+	songName: string;
+}
+
+export interface Attendee {
+	email: string;
+	name: string;
+}
+
+export interface ActivityDetail {
+	activity: Activity;
+	setlist: SetlistEntry[];
+	/** Only the director gets the attendee names; null for everyone else. */
+	attendees: Attendee[] | null;
+}
