@@ -3,6 +3,8 @@ import { DomainError, parseOrThrow } from "#/shared/errors";
 import { byName } from "#/shared/schemas";
 import { type Member, memberInputSchema } from "./members.types";
 
+const LAST_DIRECTOR_MESSAGE = "La banda necesita al menos un director";
+
 export type MembersService = ReturnType<typeof createMembersService>;
 
 export function createMembersService(repo: EntityRepository<Member>) {
@@ -10,6 +12,18 @@ export function createMembersService(repo: EntityRepository<Member>) {
 		const member = await repo.get(email.trim().toLowerCase());
 		if (!member) throw new DomainError("not_found", "No existe ese miembro");
 		return member;
+	}
+
+	/** Without a director nobody can manage the band, so the last one cannot leave the role. */
+	async function assertAnotherDirectorRemains(leaving: Member) {
+		if (leaving.role !== "director") return;
+
+		const otherDirectors = (await repo.list()).filter(
+			(member) => member.role === "director" && member.email !== leaving.email,
+		);
+		if (otherDirectors.length === 0) {
+			throw new DomainError("invalid", LAST_DIRECTOR_MESSAGE);
+		}
 	}
 
 	return {
@@ -41,12 +55,15 @@ export function createMembersService(repo: EntityRepository<Member>) {
 				...(input as object),
 				email: current.email,
 			});
+			if (member.role !== "director")
+				await assertAnotherDirectorRemains(current);
 			await repo.put(member);
 			return member;
 		},
 
 		async remove(email: string): Promise<void> {
 			const member = await getOrThrow(email);
+			await assertAnotherDirectorRemains(member);
 			await repo.delete(member.email);
 		},
 

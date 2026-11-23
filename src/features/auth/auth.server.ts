@@ -14,6 +14,7 @@ import { z } from "zod";
 import { container } from "#/server/container";
 import { DomainError } from "#/shared/errors";
 import { createAuthService } from "./auth.service";
+import type { LoginErrorCode } from "./login-errors";
 import { SESSION_COOKIE, SESSION_MAX_AGE_SECONDS } from "./session";
 
 const OAUTH_STATE_COOKIE = "fob_oauth_state";
@@ -21,8 +22,6 @@ const OAUTH_VERIFIER_COOKIE = "fob_oauth_verifier";
 const OAUTH_COOKIE_MAX_AGE_SECONDS = 10 * 60;
 const GOOGLE_CALLBACK_PATH = "/auth/google/callback";
 const GOOGLE_SCOPES = ["openid", "email", "profile"];
-const LOGIN_FAILED_MESSAGE =
-	"No pudimos completar el ingreso con Google. Probá de nuevo.";
 
 const PRIVATE_COOKIE = {
 	httpOnly: true,
@@ -62,8 +61,8 @@ function redirectTo(location: string): Response {
 	return new Response(null, { status: 302, headers: { Location: location } });
 }
 
-function redirectToLoginWithError(message: string): Response {
-	return redirectTo(`/login?${new URLSearchParams({ error: message })}`);
+function redirectToLoginWithError(code: LoginErrorCode): Response {
+	return redirectTo(`/login?${new URLSearchParams({ error: code })}`);
 }
 
 export function readSessionToken(): string | undefined {
@@ -109,7 +108,8 @@ export async function completeGoogleLogin(request: Request): Promise<Response> {
 
 	try {
 		const identity = await readGoogleIdentity(request);
-		if (!identity) return redirectToLoginWithError(LOGIN_FAILED_MESSAGE);
+		if (!identity) return redirectToLoginWithError("failed");
+		if (!identity.email_verified) return redirectToLoginWithError("unverified");
 
 		const token = await getAuthService().completeLogin(
 			identity.email,
@@ -121,10 +121,11 @@ export async function completeGoogleLogin(request: Request): Promise<Response> {
 		});
 		return redirectTo("/");
 	} catch (error) {
+		// The email is verified at this point, so the only rejection left is a non-member.
 		if (error instanceof DomainError)
-			return redirectToLoginWithError(error.message);
+			return redirectToLoginWithError("not_member");
 		console.error("Google login failed", error);
-		return redirectToLoginWithError(LOGIN_FAILED_MESSAGE);
+		return redirectToLoginWithError("failed");
 	}
 }
 

@@ -148,6 +148,80 @@ describe("members service", () => {
 		]);
 	});
 
+	describe("keeps at least one director", () => {
+		const LAST_DIRECTOR_MESSAGE = "La banda necesita al menos un director";
+		const director = {
+			email: "director@gmail.com",
+			name: "Director",
+			role: "director",
+			part: "Saxofón",
+		};
+
+		async function expectLastDirectorRejection(action: Promise<unknown>) {
+			const error = await action.catch((e: unknown) => e);
+			expect(error).toBeInstanceOf(DomainError);
+			expect(error).toMatchObject({
+				code: "invalid",
+				message: LAST_DIRECTOR_MESSAGE,
+			});
+		}
+
+		it("rejects removing the last director and keeps them", async () => {
+			const stored = await ctx.service.create(director);
+
+			await expectLastDirectorRejection(
+				ctx.service.remove("director@gmail.com"),
+			);
+
+			expect(await ctx.service.findByEmail("director@gmail.com")).toEqual(
+				stored,
+			);
+		});
+
+		it("rejects demoting the last director and keeps the role", async () => {
+			const stored = await ctx.service.create(director);
+
+			await expectLastDirectorRejection(
+				ctx.service.update("director@gmail.com", {
+					...director,
+					role: "musician",
+				}),
+			);
+
+			expect(await ctx.service.findByEmail("director@gmail.com")).toEqual(
+				stored,
+			);
+		});
+
+		it("allows removing or demoting a director while another remains", async () => {
+			await ctx.service.create(director);
+			await ctx.service.create({ ...director, email: "otro@gmail.com" });
+			await ctx.service.create({ ...director, email: "tercero@gmail.com" });
+
+			await ctx.service.update("director@gmail.com", {
+				...director,
+				role: "sound",
+			});
+			await ctx.service.remove("otro@gmail.com");
+
+			expect((await ctx.service.list()).map((m) => [m.email, m.role])).toEqual([
+				["director@gmail.com", "sound"],
+				["tercero@gmail.com", "director"],
+			]);
+		});
+
+		it("lets the last director edit their own data while staying director", async () => {
+			await ctx.service.create(director);
+
+			const updated = await ctx.service.update("director@gmail.com", {
+				...director,
+				part: "Trompeta 1",
+			});
+
+			expect(updated.part).toBe("Trompeta 1");
+		});
+	});
+
 	it("removes a section from every member", async () => {
 		await ctx.service.create({
 			email: "a@gmail.com",

@@ -2,6 +2,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { z } from "zod";
 import { ThemedButton } from "#/components/ui/ThemedButton";
 import { getCurrentMember } from "#/features/auth/auth.functions";
+import { loginErrorMessage } from "#/features/auth/login-errors";
 
 const loginSearchSchema = z.object({
 	error: z.string().optional(),
@@ -17,6 +18,7 @@ export const Route = createFileRoute("/login")({
 
 function Login() {
 	const { error } = Route.useSearch();
+	const errorMessage = loginErrorMessage(error);
 
 	return (
 		<main className="mx-auto flex min-h-dvh max-w-md flex-col items-center justify-center gap-8 px-6 text-center">
@@ -28,9 +30,9 @@ function Login() {
 			<p className="font-serif text-xl italic text-fob-subtle">
 				Creando momentos a través de la música
 			</p>
-			{error && (
+			{errorMessage && (
 				<p role="alert" className="text-destructive text-sm">
-					{error}
+					{errorMessage}
 				</p>
 			)}
 			<ThemedButton href="/auth/google">Entrar con Google</ThemedButton>
