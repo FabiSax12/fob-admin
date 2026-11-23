@@ -21,6 +21,8 @@ import { Route as AppMiembrosEmailRouteImport } from './routes/_app/miembros/$em
 import { Route as AppMiembrosNuevoRouteImport } from './routes/_app/miembros/nuevo'
 import { Route as AppMiembrosSeccionesRouteImport } from './routes/_app/miembros/secciones'
 import { Route as AppRepertorioIndexRouteImport } from './routes/_app/repertorio/index'
+import { Route as AppRepertorioSongIdRouteImport } from './routes/_app/repertorio/$songId'
+import { Route as AppRepertorioNuevaRouteImport } from './routes/_app/repertorio/nueva'
 import { Route as AuthGoogleCallbackRouteImport } from './routes/auth/google.callback'
 
 const AppRoute = AppRouteImport.update({
@@ -82,6 +84,16 @@ const AppRepertorioIndexRoute = AppRepertorioIndexRouteImport.update({
   path: '/repertorio/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppRepertorioSongIdRoute = AppRepertorioSongIdRouteImport.update({
+  id: '/repertorio/$songId',
+  path: '/repertorio/$songId',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppRepertorioNuevaRoute = AppRepertorioNuevaRouteImport.update({
+  id: '/repertorio/nueva',
+  path: '/repertorio/nueva',
+  getParentRoute: () => AppRoute,
+} as any)
 const AuthGoogleCallbackRoute = AuthGoogleCallbackRouteImport.update({
   id: '/callback',
   path: '/callback',
@@ -97,6 +109,8 @@ export interface FileRoutesByFullPath {
   '/miembros/$email': typeof AppMiembrosEmailRoute
   '/miembros/nuevo': typeof AppMiembrosNuevoRoute
   '/miembros/secciones': typeof AppMiembrosSeccionesRoute
+  '/repertorio/$songId': typeof AppRepertorioSongIdRoute
+  '/repertorio/nueva': typeof AppRepertorioNuevaRoute
   '/auth/google/callback': typeof AuthGoogleCallbackRoute
   '/actividades/': typeof AppActividadesIndexRoute
   '/miembros/': typeof AppMiembrosIndexRoute
@@ -110,6 +124,8 @@ export interface FileRoutesByTo {
   '/miembros/$email': typeof AppMiembrosEmailRoute
   '/miembros/nuevo': typeof AppMiembrosNuevoRoute
   '/miembros/secciones': typeof AppMiembrosSeccionesRoute
+  '/repertorio/$songId': typeof AppRepertorioSongIdRoute
+  '/repertorio/nueva': typeof AppRepertorioNuevaRoute
   '/auth/google/callback': typeof AuthGoogleCallbackRoute
   '/actividades': typeof AppActividadesIndexRoute
   '/miembros': typeof AppMiembrosIndexRoute
@@ -126,6 +142,8 @@ export interface FileRoutesById {
   '/_app/miembros/$email': typeof AppMiembrosEmailRoute
   '/_app/miembros/nuevo': typeof AppMiembrosNuevoRoute
   '/_app/miembros/secciones': typeof AppMiembrosSeccionesRoute
+  '/_app/repertorio/$songId': typeof AppRepertorioSongIdRoute
+  '/_app/repertorio/nueva': typeof AppRepertorioNuevaRoute
   '/auth/google/callback': typeof AuthGoogleCallbackRoute
   '/_app/actividades/': typeof AppActividadesIndexRoute
   '/_app/miembros/': typeof AppMiembrosIndexRoute
@@ -142,6 +160,8 @@ export interface FileRouteTypes {
     | '/miembros/$email'
     | '/miembros/nuevo'
     | '/miembros/secciones'
+    | '/repertorio/$songId'
+    | '/repertorio/nueva'
     | '/auth/google/callback'
     | '/actividades/'
     | '/miembros/'
@@ -155,6 +175,8 @@ export interface FileRouteTypes {
     | '/miembros/$email'
     | '/miembros/nuevo'
     | '/miembros/secciones'
+    | '/repertorio/$songId'
+    | '/repertorio/nueva'
     | '/auth/google/callback'
     | '/actividades'
     | '/miembros'
@@ -170,6 +192,8 @@ export interface FileRouteTypes {
     | '/_app/miembros/$email'
     | '/_app/miembros/nuevo'
     | '/_app/miembros/secciones'
+    | '/_app/repertorio/$songId'
+    | '/_app/repertorio/nueva'
     | '/auth/google/callback'
     | '/_app/actividades/'
     | '/_app/miembros/'
@@ -269,6 +293,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRepertorioIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/repertorio/$songId': {
+      id: '/_app/repertorio/$songId'
+      path: '/repertorio/$songId'
+      fullPath: '/repertorio/$songId'
+      preLoaderRoute: typeof AppRepertorioSongIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/repertorio/nueva': {
+      id: '/_app/repertorio/nueva'
+      path: '/repertorio/nueva'
+      fullPath: '/repertorio/nueva'
+      preLoaderRoute: typeof AppRepertorioNuevaRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/auth/google/callback': {
       id: '/auth/google/callback'
       path: '/callback'
@@ -299,6 +337,8 @@ const AppMiembrosRouteRouteWithChildren =
 interface AppRouteChildren {
   AppMiembrosRouteRoute: typeof AppMiembrosRouteRouteWithChildren
   AppIndexRoute: typeof AppIndexRoute
+  AppRepertorioSongIdRoute: typeof AppRepertorioSongIdRoute
+  AppRepertorioNuevaRoute: typeof AppRepertorioNuevaRoute
   AppActividadesIndexRoute: typeof AppActividadesIndexRoute
   AppRepertorioIndexRoute: typeof AppRepertorioIndexRoute
 }
@@ -306,6 +346,8 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppMiembrosRouteRoute: AppMiembrosRouteRouteWithChildren,
   AppIndexRoute: AppIndexRoute,
+  AppRepertorioSongIdRoute: AppRepertorioSongIdRoute,
+  AppRepertorioNuevaRoute: AppRepertorioNuevaRoute,
   AppActividadesIndexRoute: AppActividadesIndexRoute,
   AppRepertorioIndexRoute: AppRepertorioIndexRoute,
 }
