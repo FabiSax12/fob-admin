@@ -5,8 +5,10 @@ import { container } from "#/server/container";
 import { s3ScoreStorage } from "./s3-score-storage";
 import {
 	missingParts,
+	type PartUploadChoice,
 	parsePartName,
-	partNameFromFileName,
+	parsePartUploads,
+	uploadableParts,
 } from "./score-storage";
 import type { Song } from "./songs.types";
 
@@ -15,6 +17,8 @@ export interface SongDetail {
 	parts: string[];
 	/** Member parts with no PDF yet. Only the director gets it; null for everyone else. */
 	missingParts: string[] | null;
+	/** Parts a PDF can be uploaded for: member parts plus parts already uploaded. Director only; null for everyone else. */
+	bandParts: string[] | null;
 }
 
 export interface PartUpload {
@@ -25,7 +29,7 @@ export interface PartUpload {
 
 interface PartUploadRequest {
 	songId: string;
-	fileNames: string[];
+	uploads: PartUploadChoice[];
 }
 
 interface PartRef {
@@ -47,16 +51,16 @@ export const getSong = createServerFn({ method: "GET" })
 		if (!song) return null;
 
 		const parts = await s3ScoreStorage.listParts(song.name);
-		if (member.role !== "director") return { song, parts, missingParts: null };
+		if (member.role !== "director")
+			return { song, parts, missingParts: null, bandParts: null };
 
 		const members = await container.members.list();
+		const memberParts = members.map((bandMember) => bandMember.part);
 		return {
 			song,
 			parts,
-			missingParts: missingParts(
-				members.map((bandMember) => bandMember.part),
-				parts,
-			),
+			missingParts: missingParts(memberParts, parts),
+			bandParts: uploadableParts(memberParts, parts),
 		};
 	});
 
@@ -76,10 +80,7 @@ export const requestPartUploads = createServerFn({ method: "POST" })
 		toActionResult(async (): Promise<PartUpload[]> => {
 			await requireDirector();
 			const song = await container.songs.getOrThrow(data.songId);
-			const uploads = data.fileNames.map((fileName) => ({
-				fileName,
-				part: partNameFromFileName(fileName),
-			}));
+			const uploads = parsePartUploads(data.uploads);
 			return Promise.all(
 				uploads.map(async (upload) => ({
 					...upload,

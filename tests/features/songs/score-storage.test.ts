@@ -1,45 +1,76 @@
 import { describe, expect, it } from "vitest";
 import {
 	missingParts,
-	partNameFromFileName,
+	parsePartUploads,
 	partNameFromKey,
+	suggestPart,
+	uploadableParts,
 } from "#/features/songs/score-storage";
 
-describe("partNameFromFileName", () => {
-	it("takes the part name from a PDF file name", () => {
-		expect(partNameFromFileName("Trompeta 1.pdf")).toBe("Trompeta 1");
+describe("suggestPart", () => {
+	const bandParts = ["Bajo", "Saxofón Alto", "Trompeta 1", "Trompeta 2"];
+
+	it("suggests the part when the file name is the part", () => {
+		expect(suggestPart("Trompeta 1.pdf", bandParts)).toBe("Trompeta 1");
 	});
 
-	it("accepts the PDF extension in any case", () => {
-		expect(partNameFromFileName("Bajo.PDF")).toBe("Bajo");
+	it("ignores case, accents, the song name and punctuation", () => {
+		expect(suggestPart("El año viejo- SAXOFON ALTO.pdf", bandParts)).toBe(
+			"Saxofón Alto",
+		);
 	});
 
-	it("trims spaces around the file name and the part name", () => {
-		expect(partNameFromFileName("  Trompeta 2 .pdf ")).toBe("Trompeta 2");
+	it("matches a part number written next to the instrument", () => {
+		expect(suggestPart("Cumbia - TROMPETA2.pdf", bandParts)).toBe("Trompeta 2");
+	});
+
+	it("suggests nothing when the file fits more than one part", () => {
+		expect(suggestPart("El año viejo- TROMPETA.pdf", bandParts)).toBeNull();
+	});
+
+	it("suggests nothing when no part fits", () => {
+		expect(suggestPart("Guitarra.pdf", bandParts)).toBeNull();
+	});
+});
+
+describe("parsePartUploads", () => {
+	it("keeps each file with the part chosen for it, trimmed", () => {
+		expect(
+			parsePartUploads([
+				{ fileName: "El año viejo- TROMPETA.pdf", part: " Trompeta 1 " },
+				{ fileName: "bajo.PDF", part: "Bajo" },
+			]),
+		).toEqual([
+			{ fileName: "El año viejo- TROMPETA.pdf", part: "Trompeta 1" },
+			{ fileName: "bajo.PDF", part: "Bajo" },
+		]);
 	});
 
 	it("rejects a file that is not a PDF", () => {
-		expect(() => partNameFromFileName("Trompeta 1.docx")).toThrow(
-			"Solo se aceptan archivos PDF",
-		);
+		expect(() =>
+			parsePartUploads([{ fileName: "Trompeta 1.docx", part: "Trompeta 1" }]),
+		).toThrow("Solo se aceptan archivos PDF");
 	});
 
-	it("rejects a file name with a slash because it would nest folders", () => {
-		expect(() => partNameFromFileName("Vientos/Trompeta 1.pdf")).toThrow(
-			"El nombre no puede contener / ni \\",
-		);
+	it("rejects a file without a part", () => {
+		expect(() =>
+			parsePartUploads([{ fileName: "Trompeta.pdf", part: "" }]),
+		).toThrow("El nombre es obligatorio");
 	});
 
-	it("rejects a file name with a backslash", () => {
-		expect(() => partNameFromFileName("Vientos\\Trompeta 1.pdf")).toThrow(
-			"El nombre no puede contener / ni \\",
-		);
+	it("rejects a part with a slash because it would nest folders", () => {
+		expect(() =>
+			parsePartUploads([{ fileName: "a.pdf", part: "Vientos/Trompeta 1" }]),
+		).toThrow("El nombre no puede contener / ni \\");
 	});
 
-	it("rejects a PDF without a name", () => {
-		expect(() => partNameFromFileName(".pdf")).toThrow(
-			"El nombre es obligatorio",
-		);
+	it("rejects two files for the same part", () => {
+		expect(() =>
+			parsePartUploads([
+				{ fileName: "a.pdf", part: "Bajo" },
+				{ fileName: "b.pdf", part: "Bajo" },
+			]),
+		).toThrow("Elegiste la misma parte para dos archivos: Bajo");
 	});
 });
 
@@ -85,5 +116,16 @@ describe("missingParts", () => {
 		expect(missingParts(["Trompeta 1"], ["trompeta 1"])).toEqual([
 			"Trompeta 1",
 		]);
+	});
+});
+
+describe("uploadableParts", () => {
+	it("lists member parts and already uploaded parts once, alphabetically", () => {
+		expect(
+			uploadableParts(
+				["Trompeta 1", null, "Bajo", "Trompeta 1"],
+				["Güiro", "Bajo"],
+			),
+		).toEqual(["Bajo", "Güiro", "Trompeta 1"]);
 	});
 });

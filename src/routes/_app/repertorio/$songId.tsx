@@ -18,7 +18,7 @@ export const Route = createFileRoute("/_app/repertorio/$songId")({
 });
 
 function SongPage() {
-	const { song, parts, missingParts } = Route.useLoaderData();
+	const { song, parts, missingParts, bandParts } = Route.useLoaderData();
 	const { member } = Route.useRouteContext();
 	const isDirector = member.role === "director";
 
@@ -34,9 +34,9 @@ function SongPage() {
 			<PageHeader eyebrow="Repertorio" title={song.name} />
 			{missingParts && <MissingParts parts={missingParts} />}
 			<PartList songId={song.id} parts={parts} canDelete={isDirector} />
-			{isDirector && (
+			{isDirector && bandParts && (
 				<div className="mt-12 border-fob-700 border-t pt-6">
-					<PartUploader songId={song.id} />
+					<PartUploader songId={song.id} bandParts={bandParts} />
 				</div>
 			)}
 		</>

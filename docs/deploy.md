@@ -54,7 +54,7 @@ Only registered members can sign in, so the first director is inserted directly 
 TABLE=$(pnpm -s sst shell --stage production -- node -e 'console.log(JSON.parse(process.env.SST_RESOURCE_Data).name)')
 EMAIL="director@gmail.com"   # Google account, lowercase
 NAME="Nombre Director"
-PART="Saxofón"               # same name as the PDFs in each song folder
+PART="Saxofón"               # the part chosen when uploading PDFs
 
 aws dynamodb put-item --table-name "$TABLE" --item "{
   \"pk\": {\"S\": \"MEMBER#$EMAIL\"},
@@ -75,7 +75,7 @@ If the `sst shell` line doesn't print the table name, copy it from the DynamoDB 
 
 ## 5. Repertoire
 
-Create each song in **Repertorio** first. Then upload one PDF per part, named exactly like the part assigned to each musician (`Trompeta 1.pdf`). The files are stored under `repertorio/<song>/<part>.pdf` in the `Scores` bucket. When a musician's part is missing for a song, their setlist PDF gets a page with the song name instead.
+Create each song in **Repertorio** first. Then upload the part PDFs with whatever file name they have (`El año viejo- TROMPETA.pdf`) and pick the part each one belongs to; when the file name resembles a part, it comes preselected. The part list holds every part assigned to a member plus the parts the song already has, and each part keeps one PDF. The files are stored under `repertorio/<song>/<part>.pdf` in the `Scores` bucket. When a musician's part is missing for a song, their setlist PDF gets a page with the song name instead.
 
 ## Local development
 
