@@ -35,8 +35,24 @@ export default $config({
 			publicUrl: new sst.Secret("PublicUrl"),
 		};
 
+		/** Async publish effects: Google Calendar sync and one setlist PDF per musician. */
+		const publishEffects = new sst.aws.Function("PublishEffects", {
+			handler: "functions/publish-effects.handler",
+			link: [
+				table,
+				bucket,
+				secrets.googleClientId,
+				secrets.googleClientSecret,
+				secrets.bandCalendarRefreshToken,
+				secrets.publicUrl,
+			],
+			timeout: "5 minutes",
+			memory: "1024 MB",
+			runtime: "nodejs22.x",
+		});
+
 		const web = new sst.aws.TanStackStart("Web", {
-			link: [table, bucket, ...Object.values(secrets)],
+			link: [table, bucket, publishEffects, ...Object.values(secrets)],
 		});
 
 		return { url: web.url };

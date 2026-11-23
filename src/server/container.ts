@@ -1,8 +1,14 @@
 import { Resource } from "sst";
 import { createActivitiesService } from "#/features/activities/activities.service";
 import type { Activity } from "#/features/activities/activities.types";
+import type { CalendarService } from "#/features/calendar/calendar.service";
+import { createDefaultCalendarService } from "#/features/calendar/google-calendar.gateway";
 import { createMembersService } from "#/features/members/members.service";
 import type { Member } from "#/features/members/members.types";
+import type { PersonalPdf } from "#/features/publishing/personal-pdf.types";
+import { createPublishEffects } from "#/features/publishing/publish-effects";
+import { triggerPublishEffects } from "#/features/publishing/publish-trigger";
+import { createS3PersonalPdfStorage } from "#/features/publishing/s3-personal-pdf-storage";
 import { createSectionsService } from "#/features/sections/sections.service";
 import type { Section } from "#/features/sections/sections.types";
 import { createSongsService } from "#/features/songs/songs.service";
@@ -40,17 +46,60 @@ const songs = createSongsService(
 	}),
 );
 
-const activities = createActivitiesService({
-	repo: createDynamoRepository<Activity>({
-		tableName,
-		entity: "ACTIVITY",
-		idOf: (a) => a.id,
-		sortKeyOf: (a) => a.startsAt,
-	}),
-	members,
-	songs,
-	// Wired to PDF generation (T8) and Google Calendar (T9).
-	onPublished: async () => {},
+const activityRepo = createDynamoRepository<Activity>({
+	tableName,
+	entity: "ACTIVITY",
+	idOf: (a) => a.id,
+	sortKeyOf: (a) => a.startsAt,
 });
 
-export const container = { members, sections, songs, activities };
+const activities = createActivitiesService({
+	repo: activityRepo,
+	members,
+	songs,
+	onPublished: async (activity) => {
+		await publishEffects.markPending(activity);
+		await triggerPublishEffects(activity.id);
+	},
+});
+
+const personalPdfs = createDynamoRepository<PersonalPdf>({
+	tableName,
+	entity: "PDF",
+	idOf: (pdf) => pdf.id,
+	sortKeyOf: (pdf) => pdf.id,
+});
+
+const personalPdfStorage = createS3PersonalPdfStorage();
+
+let calendarService: CalendarService | undefined;
+/** Built on first use: only the PublishEffects Lambda talks to Google Calendar. */
+function bandCalendar(): CalendarService {
+	calendarService ??= createDefaultCalendarService();
+	return calendarService;
+}
+
+const publishEffects = createPublishEffects({
+	// Unscoped lookup: the effects run in the PublishEffects Lambda, without a signed-in member.
+	activities: {
+		get: (id) => activityRepo.get(id),
+		setCalendarEventId: activities.setCalendarEventId,
+	},
+	members,
+	songs,
+	scores: personalPdfStorage,
+	output: personalPdfStorage,
+	pdfs: personalPdfs,
+	calendar: { sync: (activity) => bandCalendar().sync(activity) },
+	now: () => new Date(),
+});
+
+export const container = {
+	members,
+	sections,
+	songs,
+	activities,
+	personalPdfs,
+	personalPdfStorage,
+	publishEffects,
+};

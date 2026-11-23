@@ -27,6 +27,7 @@ import {
 import { PersonalPdfSlot } from "#/features/activities/components/PersonalPdfSlot";
 import { PublishButton } from "#/features/activities/components/PublishButton";
 import { DraftChip } from "#/features/activities/components/StatusChip";
+import { PdfStatusList } from "#/features/publishing/components/PdfStatusList";
 
 const PUBLISH_FAILED_MESSAGE =
 	"No pudimos publicar la actividad. Probá de nuevo.";
@@ -143,6 +144,7 @@ function DirectorPanel({
 	const router = useRouter();
 	const [publishError, setPublishError] = useState<string | null>(null);
 	const isDraft = activity.status === "draft";
+	const hasPersonalPdfs = !isDraft && activity.type === "presentacion";
 
 	async function publish() {
 		setPublishError(null);
@@ -189,6 +191,8 @@ function DirectorPanel({
 					</ul>
 				)}
 			</div>
+
+			{hasPersonalPdfs && <PdfStatusList activity={activity} />}
 
 			<div className="flex flex-col gap-3">
 				<Button asChild variant="outline" className="h-11 self-start px-6">

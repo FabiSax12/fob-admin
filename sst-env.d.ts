@@ -27,6 +27,10 @@ declare module "sst" {
       "type": "sst.sst.Secret"
       "value": string
     }
+    "PublishEffects": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
     "Scores": {
       "name": string
       "type": "sst.aws.Bucket"
