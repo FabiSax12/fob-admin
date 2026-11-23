@@ -4,7 +4,6 @@
 /* deno-fmt-ignore-file */
 /* biome-ignore-all lint: auto-generated */
 
-import "sst"
 declare module "sst" {
   export interface Resource {
     "BandCalendarRefreshToken": {
@@ -40,7 +39,7 @@ declare module "sst" {
       "value": string
     }
     "Web": {
-      "type": "sst.aws.TanStackStart"
+      "type": "sst.aws.TanstackStart"
       "url": string
     }
   }
