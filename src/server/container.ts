@@ -5,6 +5,7 @@ import type { CalendarService } from "#/features/calendar/calendar.service";
 import { createDefaultCalendarService } from "#/features/calendar/google-calendar.gateway";
 import { createMembersService } from "#/features/members/members.service";
 import type { Member } from "#/features/members/members.types";
+import type { CalendarSync } from "#/features/publishing/calendar-sync.types";
 import type { PersonalPdf } from "#/features/publishing/personal-pdf.types";
 import { createPublishEffects } from "#/features/publishing/publish-effects";
 import { triggerPublishEffects } from "#/features/publishing/publish-trigger";
@@ -70,6 +71,13 @@ const personalPdfs = createDynamoRepository<PersonalPdf>({
 	sortKeyOf: (pdf) => pdf.id,
 });
 
+const calendarSyncs = createDynamoRepository<CalendarSync>({
+	tableName,
+	entity: "CALENDAR_SYNC",
+	idOf: (calendarSync) => calendarSync.id,
+	sortKeyOf: (calendarSync) => calendarSync.id,
+});
+
 const personalPdfStorage = createS3PersonalPdfStorage();
 
 let calendarService: CalendarService | undefined;
@@ -90,6 +98,7 @@ const publishEffects = createPublishEffects({
 	scores: personalPdfStorage,
 	output: personalPdfStorage,
 	pdfs: personalPdfs,
+	calendarSyncs,
 	calendar: { sync: (activity) => bandCalendar().sync(activity) },
 	now: () => new Date(),
 });
@@ -100,6 +109,7 @@ export const container = {
 	songs,
 	activities,
 	personalPdfs,
+	calendarSyncs,
 	personalPdfStorage,
 	publishEffects,
 };

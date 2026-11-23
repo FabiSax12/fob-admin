@@ -4,7 +4,7 @@ FOB Admin runs on AWS through SST. It needs a Google Cloud OAuth client (member 
 
 ## 1. Google Cloud
 
-1. Create a project at <https://console.cloud.google.com> and enable the **Google Calendar API**.
+1. Create a project at <https://console.cloud.google.com> and enable the **Google Calendar API**. If it stays disabled, publishing still works but no invitation goes out: the activity page shows the director "No se pudieron enviar las invitaciones" with Google's reason. Saving the activity again retries.
 2. **OAuth consent screen**: user type *External*. Scopes: `openid`, `email`, `profile`, `https://www.googleapis.com/auth/calendar.events`.
    Publish the app (status *In production*). While it stays in *Testing*, refresh tokens expire after 7 days and calendar invitations stop working.
 3. **Credentials → Create OAuth client ID → Web application**. Authorized redirect URIs:

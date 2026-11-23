@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireDirector, requireMember } from "#/features/auth/auth.functions";
 import { container } from "#/server/container";
 import { DomainError } from "#/shared/errors";
+import type { CalendarSync } from "./calendar-sync.types";
 import {
 	canDownload,
 	pdfStatusRows,
@@ -67,4 +68,13 @@ export const getPdfStatuses = createServerFn({ method: "GET" })
 			members,
 			pdfs.filter((pdf): pdf is PersonalPdf => pdf !== null),
 		);
+	});
+
+/** Director only: whether the calendar invitations went out. Null before the first publish tracked it. */
+export const getCalendarSync = createServerFn({ method: "GET" })
+	.validator((activityId: string) => activityId)
+	.handler(async ({ data: activityId }): Promise<CalendarSync | null> => {
+		const director = await requireDirector();
+		const activity = await container.activities.getFor(director, activityId);
+		return container.calendarSyncs.get(activity.id);
 	});

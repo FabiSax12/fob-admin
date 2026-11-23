@@ -11,6 +11,7 @@ import {
 } from "#/features/pdf/setlist-pdf";
 import type { SongsService } from "#/features/songs/songs.service";
 import type { EntityRepository } from "#/shared/entity-repository";
+import type { CalendarSync, CalendarSyncStatus } from "./calendar-sync.types";
 import {
 	personalPdfId,
 	personalPdfKey,
@@ -19,6 +20,8 @@ import {
 import type { PersonalPdf, PersonalPdfStatus } from "./personal-pdf.types";
 
 const MAX_ERROR_LENGTH = 200;
+/** Google's reasons can carry a link the director has to follow, so they get more room. */
+const MAX_CALENDAR_ERROR_LENGTH = 1000;
 
 /** Reads the PDF of one part of a song; null when that part was never uploaded. */
 export interface ScoreReader {
@@ -42,6 +45,7 @@ interface Deps {
 	scores: ScoreReader;
 	output: GeneratedPdfWriter;
 	pdfs: EntityRepository<PersonalPdf>;
+	calendarSyncs: EntityRepository<CalendarSync>;
 	calendar: Pick<CalendarService, "sync">;
 	now: () => Date;
 }
@@ -63,6 +67,7 @@ export function createPublishEffects({
 	scores,
 	output,
 	pdfs,
+	calendarSyncs,
 	calendar,
 	now,
 }: Deps) {
@@ -87,6 +92,37 @@ export function createPublishEffects({
 			updatedAt: now().toISOString(),
 			error: changes.error ?? null,
 		});
+	}
+
+	function saveCalendarSync(
+		activity: Activity,
+		status: CalendarSyncStatus,
+		error: string | null = null,
+	) {
+		return calendarSyncs.put({
+			id: activity.id,
+			status,
+			error,
+			updatedAt: now().toISOString(),
+		});
+	}
+
+	/** Only informs the director: failing to record it must not stop the PDFs nor undo a sent invitation. */
+	async function recordCalendarSync(activity: Activity, failure: unknown) {
+		try {
+			if (failure === null) await saveCalendarSync(activity, "sent");
+			else
+				await saveCalendarSync(
+					activity,
+					"failed",
+					shortErrorMessage(failure, MAX_CALENDAR_ERROR_LENGTH),
+				);
+		} catch (error) {
+			console.error(
+				`Could not record the calendar status of activity ${activity.id}`,
+				error,
+			);
+		}
 	}
 
 	async function syncCalendar(activity: Activity) {
@@ -166,6 +202,7 @@ export function createPublishEffects({
 	return {
 		/** Runs inside the publish request, so the attendees see "pending" before the async work starts. */
 		async markPending(activity: Activity): Promise<void> {
+			await saveCalendarSync(activity, "pending");
 			for (const musician of await musiciansOf(activity)) {
 				await savePdfStatus(activity, musician, { status: "pending" });
 			}
@@ -187,6 +224,7 @@ export function createPublishEffects({
 				console.error(`Calendar sync failed for activity ${activityId}`, error);
 				calendarFailure = error;
 			}
+			await recordCalendarSync(activity, calendarFailure);
 
 			if (activity.type === "presentacion")
 				await generatePersonalPdfs(activity);
@@ -195,7 +233,10 @@ export function createPublishEffects({
 	};
 }
 
-function shortErrorMessage(error: unknown): string {
+function shortErrorMessage(
+	error: unknown,
+	maxLength = MAX_ERROR_LENGTH,
+): string {
 	const message = error instanceof Error ? error.message : String(error);
-	return message.slice(0, MAX_ERROR_LENGTH);
+	return message.slice(0, maxLength);
 }

@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Activity } from "#/features/activities/activities.types";
 import { createMembersService } from "#/features/members/members.service";
 import type { Member } from "#/features/members/members.types";
+import type { CalendarSync } from "#/features/publishing/calendar-sync.types";
 import type { PersonalPdf } from "#/features/publishing/personal-pdf.types";
 import { createPublishEffects } from "#/features/publishing/publish-effects";
 import { createSongsService } from "#/features/songs/songs.service";
@@ -109,6 +110,9 @@ async function setup() {
 	);
 	const sync = vi.fn(async (_activity: Activity) => "event-1");
 	const pdfs = createMemoryRepository<PersonalPdf>((pdf) => pdf.id);
+	const calendarSyncs = createMemoryRepository<CalendarSync>(
+		(calendarSync) => calendarSync.id,
+	);
 
 	const effects = createPublishEffects({
 		activities: { get: activityRepo.get, setCalendarEventId },
@@ -117,6 +121,7 @@ async function setup() {
 		scores: { readPart },
 		output: { writePdf },
 		pdfs,
+		calendarSyncs,
 		calendar: { sync },
 		now: () => NOW,
 	});
@@ -133,6 +138,7 @@ async function setup() {
 	return {
 		effects,
 		pdfs,
+		calendarSyncs,
 		written,
 		readPart,
 		writePdf,
@@ -191,6 +197,21 @@ describe("markPending", () => {
 		await effects.markPending(activityWith({ type: "ensayo" }));
 
 		expect(pdfs.items.size).toBe(0);
+	});
+
+	it("marks the calendar invitations as pending for any activity type", async () => {
+		const { effects, calendarSyncs } = await setup();
+
+		await effects.markPending(activityWith({ type: "ensayo" }));
+
+		expect([...calendarSyncs.items.values()]).toEqual([
+			{
+				id: "act-1",
+				status: "pending",
+				error: null,
+				updatedAt: NOW.toISOString(),
+			},
+		]);
 	});
 });
 
@@ -322,5 +343,77 @@ describe("run", () => {
 
 		expect(sync).not.toHaveBeenCalled();
 		expect(writePdf).not.toHaveBeenCalled();
+	});
+
+	it("records the calendar invitations as sent when the sync succeeds", async () => {
+		const { effects, calendarSyncs, savePresentation } = await setup();
+		await savePresentation();
+
+		await effects.run("act-1");
+
+		expect(calendarSyncs.items.get("act-1")).toEqual({
+			id: "act-1",
+			status: "sent",
+			error: null,
+			updatedAt: NOW.toISOString(),
+		});
+	});
+
+	it("records the calendar failure with Google's reason", async () => {
+		const { effects, sync, calendarSyncs, savePresentation } = await setup();
+		await savePresentation();
+		sync.mockRejectedValue(
+			new Error("Google Calendar API has not been used in project 1"),
+		);
+		vi.spyOn(console, "error").mockImplementation(() => {});
+
+		await expect(effects.run("act-1")).rejects.toThrow();
+
+		expect(calendarSyncs.items.get("act-1")).toEqual({
+			id: "act-1",
+			status: "failed",
+			error: "Google Calendar API has not been used in project 1",
+			updatedAt: NOW.toISOString(),
+		});
+	});
+
+	it("still builds the PDFs when recording the calendar status fails", async () => {
+		const { effects, sync, calendarSyncs, pdfs, savePresentation } =
+			await setup();
+		await savePresentation();
+		sync.mockRejectedValue(new Error("Google no responde"));
+		vi.spyOn(calendarSyncs, "put").mockRejectedValue(
+			new Error("DynamoDB no responde"),
+		);
+		vi.spyOn(console, "error").mockImplementation(() => {});
+
+		await expect(effects.run("act-1")).rejects.toThrow("Google no responde");
+
+		expect(pdfOf(pdfs, director.email)?.status).toBe("ready");
+		expect(pdfOf(pdfs, trumpet.email)?.status).toBe("ready");
+	});
+
+	it("keeps a successful calendar sync even when recording its status fails", async () => {
+		const { effects, calendarSyncs, savePresentation } = await setup();
+		await savePresentation();
+		vi.spyOn(calendarSyncs, "put").mockRejectedValue(
+			new Error("DynamoDB no responde"),
+		);
+		vi.spyOn(console, "error").mockImplementation(() => {});
+
+		await expect(effects.run("act-1")).resolves.toBeUndefined();
+	});
+
+	it("keeps Google's whole reason so its activation link stays usable", async () => {
+		const { effects, sync, calendarSyncs, savePresentation } = await setup();
+		await savePresentation();
+		const reason =
+			"Google Calendar API has not been used in project 235408762166 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/calendar-json.googleapis.com/overview?project=235408762166 then retry.";
+		sync.mockRejectedValue(new Error(reason));
+		vi.spyOn(console, "error").mockImplementation(() => {});
+
+		await expect(effects.run("act-1")).rejects.toThrow();
+
+		expect(calendarSyncs.items.get("act-1")?.error).toBe(reason);
 	});
 });

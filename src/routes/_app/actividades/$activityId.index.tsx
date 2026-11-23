@@ -27,6 +27,7 @@ import {
 import { PersonalPdfSlot } from "#/features/activities/components/PersonalPdfSlot";
 import { PublishButton } from "#/features/activities/components/PublishButton";
 import { DraftChip } from "#/features/activities/components/StatusChip";
+import { CalendarSyncStatus } from "#/features/publishing/components/CalendarSyncStatus";
 import { PdfStatusList } from "#/features/publishing/components/PdfStatusList";
 
 const PUBLISH_FAILED_MESSAGE =
@@ -191,6 +192,10 @@ function DirectorPanel({
 					</ul>
 				)}
 			</div>
+
+			{activity.status === "published" && (
+				<CalendarSyncStatus activity={activity} />
+			)}
 
 			{hasPersonalPdfs && <PdfStatusList activity={activity} />}
 
