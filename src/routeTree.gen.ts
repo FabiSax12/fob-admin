@@ -9,50 +9,433 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppRouteImport } from './routes/_app'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AppIndexRouteImport } from './routes/_app/index'
+import { Route as AppMiembrosRouteRouteImport } from './routes/_app/miembros/route'
+import { Route as AuthGoogleRouteImport } from './routes/auth/google'
+import { Route as AuthLogoutRouteImport } from './routes/auth/logout'
+import { Route as AppActividadesIndexRouteImport } from './routes/_app/actividades/index'
+import { Route as AppActividadesNuevaRouteImport } from './routes/_app/actividades/nueva'
+import { Route as AppMiembrosIndexRouteImport } from './routes/_app/miembros/index'
+import { Route as AppMiembrosEmailRouteImport } from './routes/_app/miembros/$email'
+import { Route as AppMiembrosNuevoRouteImport } from './routes/_app/miembros/nuevo'
+import { Route as AppMiembrosSeccionesRouteImport } from './routes/_app/miembros/secciones'
+import { Route as AppRepertorioIndexRouteImport } from './routes/_app/repertorio/index'
+import { Route as AppRepertorioSongIdRouteImport } from './routes/_app/repertorio/$songId'
+import { Route as AppRepertorioNuevaRouteImport } from './routes/_app/repertorio/nueva'
+import { Route as AuthGoogleCallbackRouteImport } from './routes/auth/google.callback'
+import { Route as AppActividadesActivityIdIndexRouteImport } from './routes/_app/actividades/$activityId.index'
+import { Route as AppActividadesActivityIdEditarRouteImport } from './routes/_app/actividades/$activityId.editar'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMiembrosRouteRoute = AppMiembrosRouteRouteImport.update({
+  id: '/miembros',
+  path: '/miembros',
+  getParentRoute: () => AppRoute,
+} as any)
+const AuthGoogleRoute = AuthGoogleRouteImport.update({
+  id: '/auth/google',
+  path: '/auth/google',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthLogoutRoute = AuthLogoutRouteImport.update({
+  id: '/auth/logout',
+  path: '/auth/logout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppActividadesIndexRoute = AppActividadesIndexRouteImport.update({
+  id: '/actividades/',
+  path: '/actividades/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppActividadesNuevaRoute = AppActividadesNuevaRouteImport.update({
+  id: '/actividades/nueva',
+  path: '/actividades/nueva',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMiembrosIndexRoute = AppMiembrosIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppMiembrosRouteRoute,
+} as any)
+const AppMiembrosEmailRoute = AppMiembrosEmailRouteImport.update({
+  id: '/$email',
+  path: '/$email',
+  getParentRoute: () => AppMiembrosRouteRoute,
+} as any)
+const AppMiembrosNuevoRoute = AppMiembrosNuevoRouteImport.update({
+  id: '/nuevo',
+  path: '/nuevo',
+  getParentRoute: () => AppMiembrosRouteRoute,
+} as any)
+const AppMiembrosSeccionesRoute = AppMiembrosSeccionesRouteImport.update({
+  id: '/secciones',
+  path: '/secciones',
+  getParentRoute: () => AppMiembrosRouteRoute,
+} as any)
+const AppRepertorioIndexRoute = AppRepertorioIndexRouteImport.update({
+  id: '/repertorio/',
+  path: '/repertorio/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppRepertorioSongIdRoute = AppRepertorioSongIdRouteImport.update({
+  id: '/repertorio/$songId',
+  path: '/repertorio/$songId',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppRepertorioNuevaRoute = AppRepertorioNuevaRouteImport.update({
+  id: '/repertorio/nueva',
+  path: '/repertorio/nueva',
+  getParentRoute: () => AppRoute,
+} as any)
+const AuthGoogleCallbackRoute = AuthGoogleCallbackRouteImport.update({
+  id: '/callback',
+  path: '/callback',
+  getParentRoute: () => AuthGoogleRoute,
+} as any)
+const AppActividadesActivityIdIndexRoute =
+  AppActividadesActivityIdIndexRouteImport.update({
+    id: '/actividades/$activityId/',
+    path: '/actividades/$activityId/',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppActividadesActivityIdEditarRoute =
+  AppActividadesActivityIdEditarRouteImport.update({
+    id: '/actividades/$activityId/editar',
+    path: '/actividades/$activityId/editar',
+    getParentRoute: () => AppRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof AppIndexRoute
+  '/login': typeof LoginRoute
+  '/miembros': typeof AppMiembrosRouteRouteWithChildren
+  '/auth/google': typeof AuthGoogleRouteWithChildren
+  '/auth/logout': typeof AuthLogoutRoute
+  '/actividades/nueva': typeof AppActividadesNuevaRoute
+  '/miembros/$email': typeof AppMiembrosEmailRoute
+  '/miembros/nuevo': typeof AppMiembrosNuevoRoute
+  '/miembros/secciones': typeof AppMiembrosSeccionesRoute
+  '/repertorio/$songId': typeof AppRepertorioSongIdRoute
+  '/repertorio/nueva': typeof AppRepertorioNuevaRoute
+  '/auth/google/callback': typeof AuthGoogleCallbackRoute
+  '/actividades/': typeof AppActividadesIndexRoute
+  '/miembros/': typeof AppMiembrosIndexRoute
+  '/repertorio/': typeof AppRepertorioIndexRoute
+  '/actividades/$activityId/editar': typeof AppActividadesActivityIdEditarRoute
+  '/actividades/$activityId/': typeof AppActividadesActivityIdIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/auth/google': typeof AuthGoogleRouteWithChildren
+  '/auth/logout': typeof AuthLogoutRoute
+  '/': typeof AppIndexRoute
+  '/actividades/nueva': typeof AppActividadesNuevaRoute
+  '/miembros/$email': typeof AppMiembrosEmailRoute
+  '/miembros/nuevo': typeof AppMiembrosNuevoRoute
+  '/miembros/secciones': typeof AppMiembrosSeccionesRoute
+  '/repertorio/$songId': typeof AppRepertorioSongIdRoute
+  '/repertorio/nueva': typeof AppRepertorioNuevaRoute
+  '/auth/google/callback': typeof AuthGoogleCallbackRoute
+  '/actividades': typeof AppActividadesIndexRoute
+  '/miembros': typeof AppMiembrosIndexRoute
+  '/repertorio': typeof AppRepertorioIndexRoute
+  '/actividades/$activityId/editar': typeof AppActividadesActivityIdEditarRoute
+  '/actividades/$activityId': typeof AppActividadesActivityIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
+  '/login': typeof LoginRoute
+  '/_app/miembros': typeof AppMiembrosRouteRouteWithChildren
+  '/auth/google': typeof AuthGoogleRouteWithChildren
+  '/auth/logout': typeof AuthLogoutRoute
+  '/_app/': typeof AppIndexRoute
+  '/_app/actividades/nueva': typeof AppActividadesNuevaRoute
+  '/_app/miembros/$email': typeof AppMiembrosEmailRoute
+  '/_app/miembros/nuevo': typeof AppMiembrosNuevoRoute
+  '/_app/miembros/secciones': typeof AppMiembrosSeccionesRoute
+  '/_app/repertorio/$songId': typeof AppRepertorioSongIdRoute
+  '/_app/repertorio/nueva': typeof AppRepertorioNuevaRoute
+  '/auth/google/callback': typeof AuthGoogleCallbackRoute
+  '/_app/actividades/': typeof AppActividadesIndexRoute
+  '/_app/miembros/': typeof AppMiembrosIndexRoute
+  '/_app/repertorio/': typeof AppRepertorioIndexRoute
+  '/_app/actividades/$activityId/editar': typeof AppActividadesActivityIdEditarRoute
+  '/_app/actividades/$activityId/': typeof AppActividadesActivityIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/miembros'
+    | '/auth/google'
+    | '/auth/logout'
+    | '/actividades/nueva'
+    | '/miembros/$email'
+    | '/miembros/nuevo'
+    | '/miembros/secciones'
+    | '/repertorio/$songId'
+    | '/repertorio/nueva'
+    | '/auth/google/callback'
+    | '/actividades/'
+    | '/miembros/'
+    | '/repertorio/'
+    | '/actividades/$activityId/editar'
+    | '/actividades/$activityId/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/login'
+    | '/auth/google'
+    | '/auth/logout'
+    | '/'
+    | '/actividades/nueva'
+    | '/miembros/$email'
+    | '/miembros/nuevo'
+    | '/miembros/secciones'
+    | '/repertorio/$songId'
+    | '/repertorio/nueva'
+    | '/auth/google/callback'
+    | '/actividades'
+    | '/miembros'
+    | '/repertorio'
+    | '/actividades/$activityId/editar'
+    | '/actividades/$activityId'
+  id:
+    | '__root__'
+    | '/_app'
+    | '/login'
+    | '/_app/miembros'
+    | '/auth/google'
+    | '/auth/logout'
+    | '/_app/'
+    | '/_app/actividades/nueva'
+    | '/_app/miembros/$email'
+    | '/_app/miembros/nuevo'
+    | '/_app/miembros/secciones'
+    | '/_app/repertorio/$songId'
+    | '/_app/repertorio/nueva'
+    | '/auth/google/callback'
+    | '/_app/actividades/'
+    | '/_app/miembros/'
+    | '/_app/repertorio/'
+    | '/_app/actividades/$activityId/editar'
+    | '/_app/actividades/$activityId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  AuthGoogleRoute: typeof AuthGoogleRouteWithChildren
+  AuthLogoutRoute: typeof AuthLogoutRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/': {
+      id: '/_app/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/miembros': {
+      id: '/_app/miembros'
+      path: '/miembros'
+      fullPath: '/miembros'
+      preLoaderRoute: typeof AppMiembrosRouteRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/auth/google': {
+      id: '/auth/google'
+      path: '/auth/google'
+      fullPath: '/auth/google'
+      preLoaderRoute: typeof AuthGoogleRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/auth/logout': {
+      id: '/auth/logout'
+      path: '/auth/logout'
+      fullPath: '/auth/logout'
+      preLoaderRoute: typeof AuthLogoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/actividades/': {
+      id: '/_app/actividades/'
+      path: '/actividades'
+      fullPath: '/actividades/'
+      preLoaderRoute: typeof AppActividadesIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/actividades/nueva': {
+      id: '/_app/actividades/nueva'
+      path: '/actividades/nueva'
+      fullPath: '/actividades/nueva'
+      preLoaderRoute: typeof AppActividadesNuevaRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/miembros/': {
+      id: '/_app/miembros/'
+      path: '/'
+      fullPath: '/miembros/'
+      preLoaderRoute: typeof AppMiembrosIndexRouteImport
+      parentRoute: typeof AppMiembrosRouteRoute
+    }
+    '/_app/miembros/$email': {
+      id: '/_app/miembros/$email'
+      path: '/$email'
+      fullPath: '/miembros/$email'
+      preLoaderRoute: typeof AppMiembrosEmailRouteImport
+      parentRoute: typeof AppMiembrosRouteRoute
+    }
+    '/_app/miembros/nuevo': {
+      id: '/_app/miembros/nuevo'
+      path: '/nuevo'
+      fullPath: '/miembros/nuevo'
+      preLoaderRoute: typeof AppMiembrosNuevoRouteImport
+      parentRoute: typeof AppMiembrosRouteRoute
+    }
+    '/_app/miembros/secciones': {
+      id: '/_app/miembros/secciones'
+      path: '/secciones'
+      fullPath: '/miembros/secciones'
+      preLoaderRoute: typeof AppMiembrosSeccionesRouteImport
+      parentRoute: typeof AppMiembrosRouteRoute
+    }
+    '/_app/repertorio/': {
+      id: '/_app/repertorio/'
+      path: '/repertorio'
+      fullPath: '/repertorio/'
+      preLoaderRoute: typeof AppRepertorioIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/repertorio/$songId': {
+      id: '/_app/repertorio/$songId'
+      path: '/repertorio/$songId'
+      fullPath: '/repertorio/$songId'
+      preLoaderRoute: typeof AppRepertorioSongIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/repertorio/nueva': {
+      id: '/_app/repertorio/nueva'
+      path: '/repertorio/nueva'
+      fullPath: '/repertorio/nueva'
+      preLoaderRoute: typeof AppRepertorioNuevaRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/auth/google/callback': {
+      id: '/auth/google/callback'
+      path: '/callback'
+      fullPath: '/auth/google/callback'
+      preLoaderRoute: typeof AuthGoogleCallbackRouteImport
+      parentRoute: typeof AuthGoogleRoute
+    }
+    '/_app/actividades/$activityId/': {
+      id: '/_app/actividades/$activityId/'
+      path: '/actividades/$activityId'
+      fullPath: '/actividades/$activityId/'
+      preLoaderRoute: typeof AppActividadesActivityIdIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/actividades/$activityId/editar': {
+      id: '/_app/actividades/$activityId/editar'
+      path: '/actividades/$activityId/editar'
+      fullPath: '/actividades/$activityId/editar'
+      preLoaderRoute: typeof AppActividadesActivityIdEditarRouteImport
+      parentRoute: typeof AppRoute
     }
   }
 }
 
+interface AppMiembrosRouteRouteChildren {
+  AppMiembrosEmailRoute: typeof AppMiembrosEmailRoute
+  AppMiembrosNuevoRoute: typeof AppMiembrosNuevoRoute
+  AppMiembrosSeccionesRoute: typeof AppMiembrosSeccionesRoute
+  AppMiembrosIndexRoute: typeof AppMiembrosIndexRoute
+}
+
+const AppMiembrosRouteRouteChildren: AppMiembrosRouteRouteChildren = {
+  AppMiembrosEmailRoute: AppMiembrosEmailRoute,
+  AppMiembrosNuevoRoute: AppMiembrosNuevoRoute,
+  AppMiembrosSeccionesRoute: AppMiembrosSeccionesRoute,
+  AppMiembrosIndexRoute: AppMiembrosIndexRoute,
+}
+
+const AppMiembrosRouteRouteWithChildren =
+  AppMiembrosRouteRoute._addFileChildren(AppMiembrosRouteRouteChildren)
+
+interface AppRouteChildren {
+  AppMiembrosRouteRoute: typeof AppMiembrosRouteRouteWithChildren
+  AppIndexRoute: typeof AppIndexRoute
+  AppActividadesNuevaRoute: typeof AppActividadesNuevaRoute
+  AppRepertorioSongIdRoute: typeof AppRepertorioSongIdRoute
+  AppRepertorioNuevaRoute: typeof AppRepertorioNuevaRoute
+  AppActividadesIndexRoute: typeof AppActividadesIndexRoute
+  AppRepertorioIndexRoute: typeof AppRepertorioIndexRoute
+  AppActividadesActivityIdEditarRoute: typeof AppActividadesActivityIdEditarRoute
+  AppActividadesActivityIdIndexRoute: typeof AppActividadesActivityIdIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppMiembrosRouteRoute: AppMiembrosRouteRouteWithChildren,
+  AppIndexRoute: AppIndexRoute,
+  AppActividadesNuevaRoute: AppActividadesNuevaRoute,
+  AppRepertorioSongIdRoute: AppRepertorioSongIdRoute,
+  AppRepertorioNuevaRoute: AppRepertorioNuevaRoute,
+  AppActividadesIndexRoute: AppActividadesIndexRoute,
+  AppRepertorioIndexRoute: AppRepertorioIndexRoute,
+  AppActividadesActivityIdEditarRoute: AppActividadesActivityIdEditarRoute,
+  AppActividadesActivityIdIndexRoute: AppActividadesActivityIdIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
+interface AuthGoogleRouteChildren {
+  AuthGoogleCallbackRoute: typeof AuthGoogleCallbackRoute
+}
+
+const AuthGoogleRouteChildren: AuthGoogleRouteChildren = {
+  AuthGoogleCallbackRoute: AuthGoogleCallbackRoute,
+}
+
+const AuthGoogleRouteWithChildren = AuthGoogleRoute._addFileChildren(
+  AuthGoogleRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
+  LoginRoute: LoginRoute,
+  AuthGoogleRoute: AuthGoogleRouteWithChildren,
+  AuthLogoutRoute: AuthLogoutRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
