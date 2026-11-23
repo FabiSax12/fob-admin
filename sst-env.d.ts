@@ -23,6 +23,10 @@ declare module "sst" {
       "type": "sst.sst.Secret"
       "value": string
     }
+    "PublicUrl": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
     "Scores": {
       "name": string
       "type": "sst.aws.Bucket"

@@ -1,3 +1,4 @@
+import { createHmac } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import { signSession, verifySession } from "#/features/auth/session";
 
@@ -61,5 +62,31 @@ describe("session token", () => {
 		for (const token of malformed) {
 			expect(verifySession(token, SECRET, NOW)).toBeNull();
 		}
+	});
+
+	it("rejects validly signed payloads with an invalid shape", () => {
+		const forge = (payload: string, secret = SECRET) => {
+			const encoded = Buffer.from(payload).toString("base64url");
+			const signature = createHmac("sha256", secret)
+				.update(encoded)
+				.digest("base64url");
+			return `${encoded}.${signature}`;
+		};
+		for (const payload of [
+			'{"email":"a@b.c","exp":null}',
+			'{"email":"a@b.c"}',
+			'{"email":"","exp":9999999999999}',
+			"[]",
+			"null",
+		]) {
+			expect(verifySession(forge(payload), SECRET, NOW)).toBeNull();
+		}
+		expect(
+			verifySession(
+				forge('{"email":"a@b.c","exp":9999999999999}', "other-secret"),
+				SECRET,
+				NOW,
+			),
+		).toBeNull();
 	});
 });

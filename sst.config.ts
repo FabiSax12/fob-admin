@@ -31,6 +31,8 @@ export default $config({
 			googleClientSecret: new sst.Secret("GoogleClientSecret"),
 			sessionSecret: new sst.Secret("SessionSecret"),
 			bandCalendarRefreshToken: new sst.Secret("BandCalendarRefreshToken"),
+			/** Public origin of the app, e.g. https://fob.example.com. Used as the OAuth redirect base. */
+			publicUrl: new sst.Secret("PublicUrl"),
 		};
 
 		const web = new sst.aws.TanStackStart("Web", {

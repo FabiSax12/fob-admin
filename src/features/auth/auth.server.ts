@@ -45,8 +45,12 @@ export function getAuthService() {
 	});
 }
 
-function createGoogleClient(request: Request): Google {
-	const redirectUri = new URL(GOOGLE_CALLBACK_PATH, request.url).toString();
+/** The callback URL is pinned to the configured public URL: behind CloudFront the request host is the Lambda origin. */
+function createGoogleClient(): Google {
+	const redirectUri = new URL(
+		GOOGLE_CALLBACK_PATH,
+		Resource.PublicUrl.value,
+	).toString();
 	return new Google(
 		Resource.GoogleClientId.value,
 		Resource.GoogleClientSecret.value,
@@ -66,10 +70,10 @@ export function readSessionToken(): string | undefined {
 	return getCookie(SESSION_COOKIE);
 }
 
-export function startGoogleLogin(request: Request): Response {
+export function startGoogleLogin(): Response {
 	const state = generateState();
 	const codeVerifier = generateCodeVerifier();
-	const authorizationUrl = createGoogleClient(request).createAuthorizationURL(
+	const authorizationUrl = createGoogleClient().createAuthorizationURL(
 		state,
 		codeVerifier,
 		GOOGLE_SCOPES,
@@ -92,7 +96,7 @@ async function readGoogleIdentity(request: Request) {
 	const codeVerifier = getCookie(OAUTH_VERIFIER_COOKIE);
 	if (!code || !state || !codeVerifier || state !== storedState) return null;
 
-	const tokens = await createGoogleClient(request).validateAuthorizationCode(
+	const tokens = await createGoogleClient().validateAuthorizationCode(
 		code,
 		codeVerifier,
 	);

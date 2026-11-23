@@ -4,7 +4,7 @@ import { startGoogleLogin } from "#/features/auth/auth.server";
 export const Route = createFileRoute("/auth/google")({
 	server: {
 		handlers: {
-			GET: ({ request }) => startGoogleLogin(request),
+			GET: () => startGoogleLogin(),
 		},
 	},
 });
