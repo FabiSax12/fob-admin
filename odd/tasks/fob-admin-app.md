@@ -24,7 +24,7 @@ User request fragments are quoted verbatim (Spanish). Decisions from the clarifi
 
 | ID | Task | Specs | Route | Status | Commit |
 | --- | --- | --- | --- | --- | --- |
-| T1 | Scaffold: TanStack Start + Tailwind + PWA, SST config (DynamoDB, S3, secrets), Vitest, lint/typecheck, README | S11, S12 | inline | pending | |
+| T1 | Scaffold: TanStack Start + Tailwind + PWA, SST config (DynamoDB, S3, secrets), Vitest, lint/typecheck, README | S11, S12 | inline | done | ffd5475 |
 | T2 | Domain model + DynamoDB repositories (members, sections, songs, activities) | S1, S3–S7 | inline | pending | |
 | T3 | Google login + member allow-list + role guards | S1, S2 | inline | pending | |
 | T4 | Members and sections admin screens (director) | S1, S4, S6 | inline | pending | |
@@ -67,4 +67,5 @@ User request fragments are quoted verbatim (Spanish). Decisions from the clarifi
 - **L4 — Mirror:** Engram mirror `odd/fob-admin-app/tasks` is pending: the local engram binary predates v2.0.0-rc.11 and the provider failed to initialize.
 - **L6 — User correction (verbatim):** "Primero que nada quiero que sepas que vamos a usar el System Design de Claude llamado "Florencia Orquesta Band" que de hecho usa "SHADCN" de base". UI must use that design system on top of shadcn/ui; its location is still unknown. The dependency list is pending a decision between arctic and Cognito.
 - **L7 — User decision (verbatim):** "Vamos con Artic @"Florencia Orquesta Band/"". Auth uses arctic (Google OAuth) plus our own signed-cookie session; Cognito is rejected. The design system lives in `Florencia Orquesta Band/` (exported Claude design system: tokens.css/json, component previews, assets, logos, app icons).
-- **L5 — Next step:** confirm the dependency list (owner policy: ask before adding dependencies), then T1.
+- **L8 — T1 evidence:** `pnpm build` produced `.output/nitro.json` with preset `aws-lambda`; `pnpm check` passed (Biome, tsc, Vitest with no tests yet). PWA uses a static `public/manifest.webmanifest` instead of vite-plugin-pwa, which does not fit SSR Start cleanly (install does not need a service worker). Devtools packages removed. Native assess of root commit ffd5475: unavailable (no base commit to compare against). Next review base: ffd5475.
+- **L5 — Next step (superseded by L8):** confirm the dependency list (owner policy: ask before adding dependencies), then T1.
