@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import {
 	CalendarDays,
+	FileMusic,
 	ListMusic,
 	LogOut,
 	type LucideIcon,
@@ -9,35 +10,47 @@ import {
 import type { Role } from "#/features/members/members.types";
 
 interface Tab {
-	to: "/actividades" | "/repertorio" | "/miembros";
+	to: "/actividades" | "/repertorio" | "/mis-partituras" | "/miembros";
 	label: string;
 	icon: LucideIcon;
-	isDirectorOnly: boolean;
+	isVisibleTo: (role: Role) => boolean;
 }
+
+const everyone = () => true;
 
 const TABS: Tab[] = [
 	{
 		to: "/actividades",
 		label: "Actividades",
 		icon: CalendarDays,
-		isDirectorOnly: false,
+		isVisibleTo: everyone,
 	},
 	{
 		to: "/repertorio",
 		label: "Repertorio",
 		icon: ListMusic,
-		isDirectorOnly: false,
+		isVisibleTo: everyone,
 	},
-	{ to: "/miembros", label: "Miembros", icon: Users, isDirectorOnly: true },
+	{
+		to: "/mis-partituras",
+		label: "Mis partes",
+		icon: FileMusic,
+		// The sonidista has no part, so nothing to upload.
+		isVisibleTo: (role) => role !== "sound",
+	},
+	{
+		to: "/miembros",
+		label: "Miembros",
+		icon: Users,
+		isVisibleTo: (role) => role === "director",
+	},
 ];
 
 const TAB_CLASSES =
 	"flex min-h-14 flex-1 flex-col items-center justify-center gap-1 text-fob-subtle text-xs transition-colors hover:text-fob-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fob-amber/50";
 
 export function AppTabBar({ role }: { role: Role }) {
-	const visibleTabs = TABS.filter(
-		(tab) => !tab.isDirectorOnly || role === "director",
-	);
+	const visibleTabs = TABS.filter((tab) => tab.isVisibleTo(role));
 
 	return (
 		<nav
