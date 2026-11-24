@@ -18,7 +18,8 @@ export const Route = createFileRoute("/_app/repertorio/$songId")({
 });
 
 function SongPage() {
-	const { song, parts, missingParts, bandParts } = Route.useLoaderData();
+	const { song, parts, missingParts, bandParts, skippedBy } =
+		Route.useLoaderData();
 	const { member } = Route.useRouteContext();
 	const isDirector = member.role === "director";
 
@@ -33,6 +34,7 @@ function SongPage() {
 			</Link>
 			<PageHeader eyebrow="Repertorio" title={song.name} />
 			{missingParts && <MissingParts parts={missingParts} />}
+			{skippedBy && skippedBy.length > 0 && <SkippedBy skips={skippedBy} />}
 			<PartList songId={song.id} parts={parts} canDelete={isDirector} />
 			{isDirector && bandParts && (
 				<div className="mt-12 border-fob-700 border-t pt-6">
@@ -56,6 +58,23 @@ function MissingParts({ parts }: { parts: string[] }) {
 		<p className="mb-6 text-sm">
 			<span className="text-fob-amber">Faltan: </span>
 			<span className="text-fob-text">{parts.join(", ")}</span>
+		</p>
+	);
+}
+
+function SkippedBy({
+	skips,
+}: {
+	skips: Array<{ memberName: string; part: string }>;
+}) {
+	return (
+		<p className="-mt-4 mb-6 text-sm">
+			<span className="text-fob-subtle">No la tienen: </span>
+			<span className="text-fob-text">
+				{skips
+					.map(({ memberName, part }) => `${memberName} (${part})`)
+					.join(", ")}
+			</span>
 		</p>
 	);
 }
