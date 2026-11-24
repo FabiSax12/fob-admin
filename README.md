@@ -36,3 +36,5 @@ tests/           Vitest, mirrors src/
 ```
 
 Deployment and Google Cloud setup: see `docs/deploy.md`.
+
+CI/CD: pull requests run `pnpm check` and `pnpm build`; every push to `main` deploys production through GitHub Actions (setup in `docs/deploy.md`, section 6).

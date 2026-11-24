@@ -77,6 +77,55 @@ If the `sst shell` line doesn't print the table name, copy it from the DynamoDB 
 
 Create each song in **Repertorio** first. Then upload the part PDFs with whatever file name they have (`El año viejo- TROMPETA.pdf`) and pick the part each one belongs to; when the file name resembles a part, it comes preselected. The part list holds every part assigned to a member plus the parts the song already has, and each part keeps one PDF. The files are stored under `repertorio/<song>/<part>.pdf` in the `Scores` bucket. When a musician's part is missing for a song, their setlist PDF gets a page with the song name instead.
 
+## 6. CI/CD (GitHub Actions)
+
+Two workflows live in `.github/workflows/`:
+
+| Workflow | Trigger | What it does |
+| --- | --- | --- |
+| `ci.yml` | every pull request | `pnpm check` (Biome, tsc, Vitest) and `pnpm build` |
+| `deploy.yml` | every push to `main` | runs `ci.yml`, then `pnpm sst deploy --stage production` |
+
+Deploys never run in parallel: a newer push waits for the running deploy, and when several pushes queue up only the latest one deploys. The pipeline reuses the secrets already set with `sst secret set` (step 2); GitHub stores no app secret.
+
+GitHub authenticates to AWS through OIDC, with no long-lived keys. One-time setup, in the AWS account that hosts production:
+
+1. **Identity provider**. IAM → Identity providers → Add provider → *OpenID Connect*:
+   - Provider URL: `https://token.actions.githubusercontent.com`
+   - Audience: `sts.amazonaws.com`
+2. **Role**. IAM → Roles → Create role → *Web identity*, pick that provider and audience. Name it, for example, `fob-admin-github-deploy`. Replace its trust policy with this one (`<ACCOUNT_ID>` is your account ID):
+
+   ```json
+   {
+     "Version": "2012-10-17",
+     "Statement": [
+       {
+         "Effect": "Allow",
+         "Principal": {
+           "Federated": "arn:aws:iam::<ACCOUNT_ID>:oidc-provider/token.actions.githubusercontent.com"
+         },
+         "Action": "sts:AssumeRoleWithWebIdentity",
+         "Condition": {
+           "StringEquals": {
+             "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
+             "token.actions.githubusercontent.com:sub": "repo:FabiSax12/fob-admin:environment:production"
+           }
+         }
+       }
+     ]
+   }
+   ```
+
+   The `sub` condition lets only jobs of this repository that run in the `production` environment assume the role. Pull requests cannot, and the branch restriction of step 4 keeps other branches from declaring that environment: it is required, not optional.
+3. **Permissions**. SST creates and updates CloudFront, Lambda, DynamoDB, S3, IAM roles, SSM parameters and its own state bucket, so the role needs broad rights. The simplest option is the `AdministratorAccess` managed policy, acceptable in an account used only for this app. To narrow it, follow SST's IAM permissions guide and test with a deploy.
+4. **GitHub**. Repository → Settings → Environments → New environment `production`. Under *Deployment branches and tags*, choose *Selected branches* and allow only `main` (required: it is what keeps other branches out of the AWS role). Then add these environment **variables** (not secrets; they are not sensitive):
+   - `AWS_DEPLOY_ROLE_ARN`: the role ARN, `arn:aws:iam::<ACCOUNT_ID>:role/fob-admin-github-deploy`
+   - `AWS_REGION`: the region production already lives in (the one in your local AWS profile when you ran the first deploy).
+
+To check it, merge a pull request into `main` and follow the run in the **Actions** tab. The deploy job links the app URL when it finishes.
+
+If the region is wrong, SST does not find the existing production state or its secrets, so the deploy fails or targets an empty stage; cancel the run and fix `AWS_REGION`.
+
 ## Local development
 
 ```bash
