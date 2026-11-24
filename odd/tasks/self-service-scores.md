@@ -20,6 +20,8 @@ Branch: `feat/self-service-scores` · Test runner: Vitest (`pnpm check`) · Buil
 | T1 | Score collection service: progress, skip, upload URL for own part, skips per song; Dynamo wiring; server functions | S2, S3, S5, S6, S7 | inline | done | f78f9ee |
 | T3 | Review fixes: staged upload + server confirm (size ≤ 20 MB, `%PDF-` header) before replacing; skip cleared only after confirm; S3 versioning + lifecycle (staging 1 day, old versions 30 days); skippedBy filter in the service with tests | S3, S6 | inline | done | c2f9c5a |
 | T4 | Review fix R3-promote-delete-failure: staging cleanup is best effort after the copy; a re-upload after the check gets a clear error; tests | S6 | inline | in progress | |
+| T5 | Final review fixes (API, PR #9): staged upload via presigned POST with content-length-range 1 B–20 MB and Content-Type application/pdf (R1-staged-put-uncapped), bucket CORS allows POST; rejection-path staging discard is best effort so the member keeps the real reason (R3/R4-reject-discard); S3 adapter unit tests through an injectable S3Client | S3, S6 | gentle-ai-worker | in progress | |
+| T6 | Final review fixes (UI, PR #10): wizard uploads with the POST form fields; PdfFirstPage destroys a loading task cancelled mid-load (R4-preview-destroy-race) | S1, S4 | inline | pending | |
 | T2 | Wizard UI at `/mis-partituras` with pdfjs first-page preview, tab entry, director view of skips on the song page, README | S1, S2, S4, S5, S6 | inline | done | 46b03cc |
 
 ## Log
@@ -46,3 +48,5 @@ Branch: `feat/self-service-scores` · Test runner: Vitest (`pnpm check`) · Buil
   - The verifier's scratch dir `/tmp/v3xdXG` was left outside the project.
 - **L10 — Native review of the fixes:** lineage `review-2831d6e471aa2112`, base 984fb8b, lenses risk + resilience + reliability → approved; authority burned. Non-blocking advisories: R1-staged-put-uncapped (the staged PUT is still uncapped, bounded by confirm + 1-day purge; a presigned POST with content-length-range would cap it); R3-promote-delete-failure (if deleting staging fails after the copy, confirm reports an error although the score was replaced and the skip stays; PreconditionFailed retry path untested).
 - **L11 — User request (verbatim):** "Corrige y publica stacked PRs" → T4, then publish stacked PRs.
+- **L14 — Native review of the whole stack:** lineage `review-249c7e6d557d154e`, base 1a1f3da → approved. Advisories: R1-staged-put-uncapped; R3-reject-discard-failure-masks-reason and R4-reject-discard-masks-reason (a failed discard on rejection replaces the size/PDF message with a generic error); R4-preview-destroy-race (fast navigation leaks pdfjs loads). CI on #9 and #10 green.
+- **L15 — User request (verbatim):** "Corrige todo, dejalo perfecto" → T5 (API, on #9) and T6 (UI, on #10, after merging #9's branch into #10 without force-push). Adds `@aws-sdk/s3-presigned-post` (official AWS SDK package) for the capped upload.
