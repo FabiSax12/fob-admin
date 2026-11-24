@@ -19,6 +19,8 @@ export interface SongDetail {
 	missingParts: string[] | null;
 	/** Parts a PDF can be uploaded for: member parts plus parts already uploaded. Director only; null for everyone else. */
 	bandParts: string[] | null;
+	/** Members who said they do not have the PDF of their part. Director only; null for everyone else. */
+	skippedBy: Array<{ memberName: string; part: string }> | null;
 }
 
 export interface PartUpload {
@@ -52,15 +54,25 @@ export const getSong = createServerFn({ method: "GET" })
 
 		const parts = await s3ScoreStorage.listParts(song.name);
 		if (member.role !== "director")
-			return { song, parts, missingParts: null, bandParts: null };
+			return {
+				song,
+				parts,
+				missingParts: null,
+				bandParts: null,
+				skippedBy: null,
+			};
 
-		const members = await container.members.list();
+		const [members, skips] = await Promise.all([
+			container.members.list(),
+			container.scoreCollection.skipsForSong(song.id, parts),
+		]);
 		const memberParts = members.map((bandMember) => bandMember.part);
 		return {
 			song,
 			parts,
 			missingParts: missingParts(memberParts, parts),
 			bandParts: uploadableParts(memberParts, parts),
+			skippedBy: skips.map(({ memberName, part }) => ({ memberName, part })),
 		};
 	});
 

@@ -12,6 +12,11 @@ import { triggerPublishEffects } from "#/features/publishing/publish-trigger";
 import { createS3PersonalPdfStorage } from "#/features/publishing/s3-personal-pdf-storage";
 import { createSectionsService } from "#/features/sections/sections.service";
 import type { Section } from "#/features/sections/sections.types";
+import { s3ScoreStorage } from "#/features/songs/s3-score-storage";
+import {
+	createScoreCollectionService,
+	type ScoreSkip,
+} from "#/features/songs/score-collection.service";
 import { createSongsService } from "#/features/songs/songs.service";
 import type { Song } from "#/features/songs/songs.types";
 import { createDynamoRepository } from "#/shared/dynamo-repository";
@@ -46,6 +51,18 @@ const songs = createSongsService(
 		sortKeyOf: (s) => s.name,
 	}),
 );
+
+const scoreCollection = createScoreCollectionService({
+	songs,
+	scores: s3ScoreStorage,
+	skips: createDynamoRepository<ScoreSkip>({
+		tableName,
+		entity: "SCORE_SKIP",
+		idOf: (skip) => skip.id,
+		sortKeyOf: (skip) => skip.id,
+	}),
+	now: () => new Date(),
+});
 
 const activityRepo = createDynamoRepository<Activity>({
 	tableName,
@@ -107,6 +124,7 @@ export const container = {
 	members,
 	sections,
 	songs,
+	scoreCollection,
 	activities,
 	personalPdfs,
 	calendarSyncs,

@@ -21,9 +21,33 @@ export default $config({
 		const bucket = new sst.aws.Bucket("Scores", {
 			cors: {
 				allowOrigins: ["*"],
-				allowMethods: ["GET", "PUT"],
+				// PUT: the director's presigned uploads; POST: members' capped staged uploads.
+				allowMethods: ["GET", "PUT", "POST"],
 				allowHeaders: ["*"],
 			},
+			// A musician replacing a part PDF by mistake can be undone from an older version.
+			versioning: true,
+		});
+
+		new aws.s3.BucketLifecycleConfiguration("ScoresLifecycle", {
+			bucket: bucket.name,
+			rules: [
+				{
+					id: "expire-staged-uploads",
+					status: "Enabled",
+					filter: { prefix: "staging/" },
+					expiration: { days: 1 },
+					// Versioning keeps deleted staged files as noncurrent versions; purge them too.
+					noncurrentVersionExpiration: { noncurrentDays: 1 },
+				},
+				{
+					id: "expire-replaced-versions",
+					status: "Enabled",
+					filter: {},
+					noncurrentVersionExpiration: { noncurrentDays: 30 },
+					expiration: { expiredObjectDeleteMarker: true },
+				},
+			],
 		});
 
 		const secrets = {

@@ -1,5 +1,6 @@
 import { DomainError, parseOrThrow } from "#/shared/errors";
 import { fileSafeName } from "#/shared/schemas";
+import type { StagedFile, StagedUpload } from "./score-collection.service";
 import { songFolder } from "./songs.service";
 
 const PDF_EXTENSION = /\.pdf$/i;
@@ -16,6 +17,18 @@ export interface PartUploadChoice {
 /** Where the part PDFs of each song live: one file per part inside the song folder. */
 export interface ScoreStorage {
 	listParts(songName: string): Promise<string[]>;
+	/** Every key under the repertoire prefix, so one listing covers every song. */
+	listScoreKeys(): Promise<string[]>;
+	/** A presigned POST that only accepts a 1 B–20 MB `application/pdf` at the staging key. */
+	createStagedUpload(stagingKey: string): Promise<StagedUpload>;
+	inspectStaged(stagingKey: string): Promise<StagedFile | null>;
+	promoteStaged(
+		stagingKey: string,
+		etag: string,
+		songName: string,
+		part: string,
+	): Promise<void>;
+	discardStaged(stagingKey: string): Promise<void>;
 	createUploadUrl(songName: string, part: string): Promise<string>;
 	createDownloadUrl(songName: string, part: string): Promise<string>;
 	deletePart(songName: string, part: string): Promise<void>;
