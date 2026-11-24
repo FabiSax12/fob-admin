@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { loadFirstPage } from "../score-upload";
 
 const PREVIEW_FAILED_MESSAGE = "No pudimos mostrar la vista previa.";
 
@@ -42,12 +43,18 @@ export function PdfFirstPage({
 
 		async function render() {
 			const pdfjs = await loadPdfjs();
-			const task = pdfjs.getDocument(await documentParams(source));
+			if (isCancelled) return;
+			const params = await documentParams(source);
+			if (isCancelled) return;
+			const task = pdfjs.getDocument(params);
 			destroy = () => task.destroy();
-			const pdf = await task.promise;
-			const page = await pdf.getPage(1);
+			const page = await loadFirstPage(task, () => isCancelled);
 			const target = canvas.current;
-			if (isCancelled || !target) return;
+			if (!page) return;
+			if (!target) {
+				await task.destroy();
+				return;
+			}
 
 			const width = target.parentElement?.clientWidth ?? 360;
 			const scale = width / page.getViewport({ scale: 1 }).width;

@@ -8,6 +8,7 @@ import {
 } from "../score-collection.functions";
 import type { WizardProgress, WizardSong } from "../score-collection.service";
 import { isPdfFileName } from "../score-storage";
+import { scoreUploadForm } from "../score-upload";
 import { getPartDownloadUrl } from "../songs.functions";
 import { PdfFirstPage, type PdfSource } from "./PdfFirstPage";
 
@@ -29,11 +30,15 @@ function songStatus(song: WizardSong): { label: string; className: string } {
 	return { label: "Falta tu PDF", className: "text-fob-amber" };
 }
 
-async function putPdf(file: File, uploadUrl: string): Promise<void> {
-	const response = await fetch(uploadUrl, {
-		method: "PUT",
-		headers: { "Content-Type": PDF_CONTENT_TYPE },
-		body: file,
+async function postPdf(
+	file: File,
+	url: string,
+	fields: Record<string, string>,
+): Promise<void> {
+	// No Content-Type header: the browser sets the multipart boundary itself.
+	const response = await fetch(url, {
+		method: "POST",
+		body: scoreUploadForm(file, fields),
 	});
 	if (!response.ok)
 		throw new Error(`S3 rejected the upload: ${response.status}`);
@@ -120,7 +125,7 @@ export function ScoreWizard({ progress }: { progress: WizardProgress }) {
 				setError(result.error);
 				return;
 			}
-			await putPdf(picked.file, result.data.uploadUrl);
+			await postPdf(picked.file, result.data.url, result.data.fields);
 			const confirmed = await confirmMyScoreUpload({ data: song.songId });
 			if (!confirmed.ok) {
 				setError(confirmed.error);
