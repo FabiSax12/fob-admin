@@ -19,7 +19,7 @@ Branch: `feat/self-service-scores` · Test runner: Vitest (`pnpm check`) · Buil
 | --- | --- | --- | --- | --- | --- |
 | T1 | Score collection service: progress, skip, upload URL for own part, skips per song; Dynamo wiring; server functions | S2, S3, S5, S6, S7 | inline | done | f78f9ee |
 | T3 | Review fixes: staged upload + server confirm (size ≤ 20 MB, `%PDF-` header) before replacing; skip cleared only after confirm; S3 versioning + lifecycle (staging 1 day, old versions 30 days); skippedBy filter in the service with tests | S3, S6 | inline | done | c2f9c5a |
-| T4 | Review fix R3-promote-delete-failure: staging cleanup is best effort after the copy; a re-upload after the check gets a clear error; tests | S6 | inline | in progress | |
+| T4 | Review fix R3-promote-delete-failure: staging cleanup is best effort after the copy; a re-upload after the check gets a clear error; tests | S6 | inline | done | fdee267 |
 | T2 | Wizard UI at `/mis-partituras` with pdfjs first-page preview, tab entry, director view of skips on the song page, README | S1, S2, S4, S5, S6 | inline | done | 46b03cc |
 
 ## Log
@@ -46,3 +46,8 @@ Branch: `feat/self-service-scores` · Test runner: Vitest (`pnpm check`) · Buil
   - The verifier's scratch dir `/tmp/v3xdXG` was left outside the project.
 - **L10 — Native review of the fixes:** lineage `review-2831d6e471aa2112`, base 984fb8b, lenses risk + resilience + reliability → approved; authority burned. Non-blocking advisories: R1-staged-put-uncapped (the staged PUT is still uncapped, bounded by confirm + 1-day purge; a presigned POST with content-length-range would cap it); R3-promote-delete-failure (if deleting staging fails after the copy, confirm reports an error although the score was replaced and the skip stays; PreconditionFailed retry path untested).
 - **L11 — User request (verbatim):** "Corrige y publica stacked PRs" → T4, then publish stacked PRs.
+- **L12 — T4 evidence:** RED (2 of 17 failed: staged file not discarded by the service; missing re-upload message) then GREEN. `pnpm check`: 157 tests; `pnpm build` OK. The service now calls `discardStaged` after the copy and the skip delete, ignoring its failure; the adapter maps `PreconditionFailed` to "El archivo cambió mientras lo revisábamos. Probá de nuevo.".
+- **L13 — Delivery (user: "publica stacked PRs"):** the local branch `feat/self-service-scores` (through fdee267) was recomposed into two slices on origin/main 1a1f3da:
+  - #9 `feat/self-service-scores-api` → main: service, functions, S3 adapter, container, sst.config, tests and this document. It passes `pnpm check` alone.
+  - #10 `feat/self-service-scores-ui` → #9: wizard, preview, tab, song page, pdfjs-dist and docs. Its tree is identical to fdee267.
+  - The original local branch is kept, unpushed. Merging stays the user's decision.
