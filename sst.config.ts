@@ -21,7 +21,8 @@ export default $config({
 		const bucket = new sst.aws.Bucket("Scores", {
 			cors: {
 				allowOrigins: ["*"],
-				allowMethods: ["GET", "PUT"],
+				// PUT: the director's presigned uploads; POST: members' capped staged uploads.
+				allowMethods: ["GET", "PUT", "POST"],
 				allowHeaders: ["*"],
 			},
 			// A musician replacing a part PDF by mistake can be undone from an older version.

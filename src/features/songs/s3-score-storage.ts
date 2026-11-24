@@ -6,10 +6,14 @@ import {
 	PutObjectCommand,
 	S3Client,
 } from "@aws-sdk/client-s3";
+import { createPresignedPost } from "@aws-sdk/s3-presigned-post";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { Resource } from "sst";
 import { DomainError } from "#/shared/errors";
-import { STAGED_CHANGED_MESSAGE } from "./score-collection.service";
+import {
+	MAX_SCORE_BYTES,
+	STAGED_CHANGED_MESSAGE,
+} from "./score-collection.service";
 import { partNameFromKey, type ScoreStorage, sortParts } from "./score-storage";
 import { partKey, REPERTOIRE_PREFIX, songFolder } from "./songs.service";
 
@@ -33,10 +37,21 @@ function copySource(bucket: string, key: string): string {
 	return `${bucket}/${key.split("/").map(encodeURIComponent).join("/")}`;
 }
 
+interface S3ScoreStorageOptions {
+	/** Defaults to a client configured from the environment. */
+	client?: S3Client;
+	/** Defaults to the linked Scores bucket. */
+	bucketName?: string;
+}
+
 /** Server-only: keeps the part PDFs in the Scores bucket, under repertorio/<song>/<part>.pdf. */
-export function createS3ScoreStorage(): ScoreStorage {
-	const s3 = new S3Client({});
-	const bucketName = () => Resource.Scores.name;
+export function createS3ScoreStorage({
+	client,
+	bucketName: bucket,
+}: S3ScoreStorageOptions = {}): ScoreStorage {
+	const s3 = client ?? new S3Client({});
+	// Read lazily: the linked resource only exists at runtime.
+	const bucketName = () => bucket ?? Resource.Scores.name;
 
 	async function listKeys(prefix: string): Promise<string[]> {
 		const keys: string[] = [];
@@ -69,14 +84,17 @@ export function createS3ScoreStorage(): ScoreStorage {
 			return listKeys(REPERTOIRE_PREFIX);
 		},
 
-		createStagedUploadUrl(stagingKey) {
-			const upload = new PutObjectCommand({
+		// A POST policy, unlike a presigned PUT, lets S3 itself refuse an oversized file.
+		createStagedUpload(stagingKey) {
+			return createPresignedPost(s3, {
 				Bucket: bucketName(),
 				Key: stagingKey,
-				ContentType: PDF_CONTENT_TYPE,
-			});
-			return getSignedUrl(s3, upload, {
-				expiresIn: UPLOAD_URL_EXPIRY_SECONDS,
+				Fields: { "Content-Type": PDF_CONTENT_TYPE },
+				Conditions: [
+					["content-length-range", 1, MAX_SCORE_BYTES],
+					{ "Content-Type": PDF_CONTENT_TYPE },
+				],
+				Expires: UPLOAD_URL_EXPIRY_SECONDS,
 			});
 		},
 

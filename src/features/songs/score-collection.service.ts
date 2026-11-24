@@ -50,9 +50,14 @@ export interface WizardProgress {
 	startIndex: number;
 }
 
-export interface OwnPartUpload {
+/** A presigned POST: the browser sends `fields` plus the file as multipart form data to `url`. */
+export interface StagedUpload {
+	url: string;
+	fields: Record<string, string>;
+}
+
+export interface OwnPartUpload extends StagedUpload {
 	part: string;
-	uploadUrl: string;
 }
 
 /** Where a member's upload waits for the server check before it replaces the score. */
@@ -65,7 +70,8 @@ interface Dependencies {
 	scores: {
 		/** Every key under the repertoire prefix, in one listing instead of one per song. */
 		listScoreKeys(): Promise<string[]>;
-		createStagedUploadUrl(stagingKey: string): Promise<string>;
+		/** S3 itself refuses a staged upload that is empty, over {@link MAX_SCORE_BYTES} or not `application/pdf`. */
+		createStagedUpload(stagingKey: string): Promise<StagedUpload>;
 		inspectStaged(stagingKey: string): Promise<StagedFile | null>;
 		/**
 		 * Copies the checked staged version over the part PDF of the song. Throws a conflict
@@ -152,8 +158,8 @@ export function createScoreCollectionService({
 		},
 
 		/**
-		 * The browser uploads to a staging key; nothing replaces the score until
-		 * {@link confirmUpload} checks the file.
+		 * The browser posts the file to a staging key, capped in size by the signed policy;
+		 * nothing replaces the score until {@link confirmUpload} checks the file.
 		 */
 		async requestUpload(
 			member: Member,
@@ -161,16 +167,17 @@ export function createScoreCollectionService({
 		): Promise<OwnPartUpload> {
 			const part = partOf(member);
 			const song = await songs.getOrThrow(songId);
-			const uploadUrl = await scores.createStagedUploadUrl(
+			const { url, fields } = await scores.createStagedUpload(
 				stagedUploadKey(member.email, song.id),
 			);
-			return { part, uploadUrl };
+			return { part, url, fields };
 		},
 
 		/**
 		 * Replaces the member's part PDF with their staged upload when it is a PDF of at most
 		 * 20 MB, and clears their skip: they did have the PDF after all. A rejected file is
-		 * discarded and leaves the stored score and the skip as they were.
+		 * discarded when possible and leaves the stored score and the skip as they were. These
+		 * checks repeat the upload policy's limits as defense in depth.
 		 */
 		async confirmUpload(
 			member: Member,
@@ -189,7 +196,8 @@ export function createScoreCollectionService({
 					? NOT_A_PDF_MESSAGE
 					: null;
 			if (problem) {
-				await scores.discardStaged(stagingKey);
+				// Best effort: the member must still learn why; a leftover expires with the lifecycle.
+				await scores.discardStaged(stagingKey).catch(() => {});
 				throw new DomainError("invalid", problem);
 			}
 
