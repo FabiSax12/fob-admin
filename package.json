@@ -21,6 +21,7 @@
     "@aws-sdk/client-lambda": "^3.1175.0",
     "@aws-sdk/client-s3": "^3.1175.0",
     "@aws-sdk/lib-dynamodb": "^3.1175.0",
+    "@aws-sdk/s3-presigned-post": "^3.1175.0",
     "@aws-sdk/s3-request-presigner": "^3.1175.0",
     "@googleapis/calendar": "^20.2.0",
     "@tailwindcss/vite": "^4.1.18",

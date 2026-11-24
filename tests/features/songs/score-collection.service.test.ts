@@ -49,9 +49,9 @@ async function setup() {
 	const promotedEtags: string[] = [];
 	const scores = {
 		listScoreKeys: async () => [...keys],
-		createStagedUploadUrl: async (stagingKey: string) => {
+		createStagedUpload: async (stagingKey: string) => {
 			stagedUrls.push(stagingKey);
-			return `https://s3.test/${stagingKey}`;
+			return { url: "https://s3.test/", fields: { key: stagingKey } };
 		},
 		inspectStaged: async (stagingKey: string): Promise<StagedFile | null> =>
 			staged.get(stagingKey) ?? null,
@@ -165,7 +165,7 @@ describe("score collection service", () => {
 		]);
 	});
 
-	it("hands out an upload URL to the member's own staging key, leaving the score and the skip untouched", async () => {
+	it("hands out an upload form for the member's own staging key, leaving the score and the skip untouched", async () => {
 		const { collection, skips, keys, stagedUrls, rebelion } = await setup();
 		await collection.skip(trumpet, rebelion.id);
 
@@ -176,7 +176,8 @@ describe("score collection service", () => {
 		);
 		expect(upload).toEqual({
 			part: "Trompeta 1",
-			uploadUrl: `https://s3.test/staging/ana@gmail.com/${rebelion.id}.pdf`,
+			url: "https://s3.test/",
+			fields: { key: `staging/ana@gmail.com/${rebelion.id}.pdf` },
 		});
 		expect(stagedUrls).toEqual([`staging/ana@gmail.com/${rebelion.id}.pdf`]);
 		expect(keys.size).toBe(0);
@@ -278,6 +279,34 @@ describe("score collection service", () => {
 
 		expect([...keys]).toEqual(["repertorio/Rebelión/Trompeta 1.pdf"]);
 		expect(staged.size).toBe(0);
+		expect(skips.items.size).toBe(1);
+	});
+
+	it.each([
+		[
+			"a file bigger than 20 MB",
+			{ size: MAX_SCORE_BYTES + 1, header: "%PDF-", etag: '"v1"' },
+			"El PDF pesa más de 20 MB",
+		],
+		[
+			"a file that is not a PDF",
+			{ size: 2_000, header: "PK\u0003\u0004\u0014", etag: '"v1"' },
+			"El archivo no es un PDF válido",
+		],
+	])("still explains the rejection of %s when discarding it fails", async (_case, file, message) => {
+		const { collection, skips, keys, staged, scores, rebelion } = await setup();
+		keys.add(partKey("Rebelión", "Trompeta 1"));
+		await collection.skip(trumpet, rebelion.id);
+		staged.set(stagedUploadKey(trumpet.email, rebelion.id), file);
+		scores.discardStaged = async () => {
+			throw new Error("S3 delete failed");
+		};
+
+		await expect(
+			collection.confirmUpload(trumpet, rebelion.id),
+		).rejects.toMatchObject({ code: "invalid", message });
+
+		expect([...keys]).toEqual(["repertorio/Rebelión/Trompeta 1.pdf"]);
 		expect(skips.items.size).toBe(1);
 	});
 

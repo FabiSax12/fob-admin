@@ -33,7 +33,10 @@ export const confirmMyScoreUpload = createServerFn({ method: "POST" })
 		}),
 	);
 
-/** The server picks the file name from the member's part; the uploaded file name is ignored. */
+/**
+ * A presigned POST (url + form fields) to the member's staging key. The server picks the file
+ * name from the member's part; the uploaded file name is ignored.
+ */
 export const requestMyScoreUpload = createServerFn({ method: "POST" })
 	.validator((songId: string) => songId)
 	.handler(({ data: songId }) =>
