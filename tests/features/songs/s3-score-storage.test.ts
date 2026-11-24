@@ -46,6 +46,26 @@ function bodyOf(text: string) {
 }
 
 describe("S3 score storage", () => {
+	it("expires the staged upload policy in 10 minutes", async () => {
+		const client = new S3Client({
+			region: "us-east-1",
+			credentials: { accessKeyId: "AKIDTEST", secretAccessKey: "secret" },
+		});
+		const storage = createS3ScoreStorage({ client, bucketName: BUCKET });
+		const before = Date.now();
+
+		const { fields } = await storage.createStagedUpload(
+			"staging/a@b.com/s.pdf",
+		);
+
+		const { expiration } = JSON.parse(
+			Buffer.from(fields.Policy, "base64").toString("utf8"),
+		);
+		const lifetime = Date.parse(expiration) - before;
+		expect(lifetime).toBeGreaterThan(9 * 60_000);
+		expect(lifetime).toBeLessThanOrEqual(10 * 60_000 + 1_000);
+	});
+
 	describe("inspectStaged", () => {
 		it("reads the total size, the first bytes and the ETag with a range GET", async () => {
 			const { sent, storage } = stubClient({

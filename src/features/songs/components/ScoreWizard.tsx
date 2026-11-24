@@ -16,6 +16,7 @@ const PDF_CONTENT_TYPE = "application/pdf";
 const NOT_A_PDF_MESSAGE = "Solo se aceptan archivos PDF";
 const MAX_SCORE_BYTES = 20 * 1024 * 1024;
 const TOO_BIG_MESSAGE = "El PDF pesa más de 20 MB";
+const EMPTY_FILE_MESSAGE = "El archivo está vacío";
 const UPLOAD_FAILED_MESSAGE = "No pudimos subir el archivo. Probá de nuevo.";
 const SKIP_FAILED_MESSAGE =
 	"No pudimos guardar que la saltaste. Probá de nuevo.";
@@ -104,6 +105,11 @@ export function ScoreWizard({ progress }: { progress: WizardProgress }) {
 		if (!isPdfFileName(file.name)) {
 			setPicked(null);
 			setError(NOT_A_PDF_MESSAGE);
+			return;
+		}
+		if (file.size === 0) {
+			setPicked(null);
+			setError(EMPTY_FILE_MESSAGE);
 			return;
 		}
 		if (file.size > MAX_SCORE_BYTES) {

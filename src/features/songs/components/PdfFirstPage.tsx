@@ -72,7 +72,7 @@ export function PdfFirstPage({
 		});
 		return () => {
 			isCancelled = true;
-			void destroy?.();
+			destroy?.().catch(() => {});
 		};
 	}, [source]);
 
