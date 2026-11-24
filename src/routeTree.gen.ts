@@ -13,6 +13,7 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppMiembrosRouteRouteImport } from './routes/_app/miembros/route'
+import { Route as AppMisPartiturasRouteImport } from './routes/_app/mis-partituras'
 import { Route as AuthGoogleRouteImport } from './routes/auth/google'
 import { Route as AuthLogoutRouteImport } from './routes/auth/logout'
 import { Route as AppActividadesIndexRouteImport } from './routes/_app/actividades/index'
@@ -45,6 +46,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
 const AppMiembrosRouteRoute = AppMiembrosRouteRouteImport.update({
   id: '/miembros',
   path: '/miembros',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMisPartiturasRoute = AppMisPartiturasRouteImport.update({
+  id: '/mis-partituras',
+  path: '/mis-partituras',
   getParentRoute: () => AppRoute,
 } as any)
 const AuthGoogleRoute = AuthGoogleRouteImport.update({
@@ -124,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/login': typeof LoginRoute
   '/miembros': typeof AppMiembrosRouteRouteWithChildren
+  '/mis-partituras': typeof AppMisPartiturasRoute
   '/auth/google': typeof AuthGoogleRouteWithChildren
   '/auth/logout': typeof AuthLogoutRoute
   '/actividades/nueva': typeof AppActividadesNuevaRoute
@@ -141,6 +148,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
+  '/mis-partituras': typeof AppMisPartiturasRoute
   '/auth/google': typeof AuthGoogleRouteWithChildren
   '/auth/logout': typeof AuthLogoutRoute
   '/': typeof AppIndexRoute
@@ -162,6 +170,7 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
   '/_app/miembros': typeof AppMiembrosRouteRouteWithChildren
+  '/_app/mis-partituras': typeof AppMisPartiturasRoute
   '/auth/google': typeof AuthGoogleRouteWithChildren
   '/auth/logout': typeof AuthLogoutRoute
   '/_app/': typeof AppIndexRoute
@@ -184,6 +193,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/miembros'
+    | '/mis-partituras'
     | '/auth/google'
     | '/auth/logout'
     | '/actividades/nueva'
@@ -201,6 +211,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
+    | '/mis-partituras'
     | '/auth/google'
     | '/auth/logout'
     | '/'
@@ -221,6 +232,7 @@ export interface FileRouteTypes {
     | '/_app'
     | '/login'
     | '/_app/miembros'
+    | '/_app/mis-partituras'
     | '/auth/google'
     | '/auth/logout'
     | '/_app/'
@@ -273,6 +285,13 @@ declare module '@tanstack/react-router' {
       path: '/miembros'
       fullPath: '/miembros'
       preLoaderRoute: typeof AppMiembrosRouteRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/mis-partituras': {
+      id: '/_app/mis-partituras'
+      path: '/mis-partituras'
+      fullPath: '/mis-partituras'
+      preLoaderRoute: typeof AppMisPartiturasRouteImport
       parentRoute: typeof AppRoute
     }
     '/auth/google': {
@@ -395,6 +414,7 @@ const AppMiembrosRouteRouteWithChildren =
 
 interface AppRouteChildren {
   AppMiembrosRouteRoute: typeof AppMiembrosRouteRouteWithChildren
+  AppMisPartiturasRoute: typeof AppMisPartiturasRoute
   AppIndexRoute: typeof AppIndexRoute
   AppActividadesNuevaRoute: typeof AppActividadesNuevaRoute
   AppRepertorioSongIdRoute: typeof AppRepertorioSongIdRoute
@@ -407,6 +427,7 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppMiembrosRouteRoute: AppMiembrosRouteRouteWithChildren,
+  AppMisPartiturasRoute: AppMisPartiturasRoute,
   AppIndexRoute: AppIndexRoute,
   AppActividadesNuevaRoute: AppActividadesNuevaRoute,
   AppRepertorioSongIdRoute: AppRepertorioSongIdRoute,
